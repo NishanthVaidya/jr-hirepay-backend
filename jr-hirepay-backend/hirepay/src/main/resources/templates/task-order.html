@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <title>Task Order</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 12px; }
+    h1 { font-size: 18px; margin-bottom: 0; }
+    .muted { color: #666; }
+    .block { margin: 12px 0; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 6px; }
+    th { background: #f4f4f4; text-align: left; }
+  </style>
+</head>
+<body>
+  <h1>Task Order</h1>
+  <div class="muted">Procedure: <span th:text="${procedureUuid}">UUID</span></div>
+
+  <div class="block">
+    <strong>Consultant</strong><br/>
+    <span th:text="${consultantName}">Jane Doe</span> &lt;<span th:text="${consultantEmail}">jane@example.com</span>&gt;
+  </div>
+
+  <div class="block">
+    <strong>Engagement</strong>
+    <table>
+      <tr><th>Role/Title</th><td th:text="${roleTitle}">Consultant</td></tr>
+      <tr><th>Start Date</th><td th:text="${startDate}">2025-08-15</td></tr>
+      <tr><th>Rate</th><td th:text="${rate}">$100/hr</td></tr>
+      <tr><th>Currency</th><td th:text="${currency}">USD</td></tr>
+      <tr><th>Client/Project</th><td th:text="${clientProject}">Acme – Revamp</td></tr>
+      <tr><th>Scope Summary</th><td th:text="${scopeSummary}">High-level scope...</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <strong>Notes</strong>
+    <div th:text="${notes}">Any special terms or notes...</div>
+  </div>
+
+  <div class="block muted">
+    Generated at <span th:text="${generatedAt}">timestamp</span> by Just Results.
+  </div>
+</body>
+</html>

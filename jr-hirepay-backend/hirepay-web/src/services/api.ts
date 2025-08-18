@@ -1,0 +1,40 @@
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_BASE || "http://localhost:8080",
+  withCredentials: false,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add a request interceptor to include the auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Optional: basic response/error logging during dev
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    // surface server-side messages consistently
+    const msg =
+      err?.response?.data?.message ||
+      err?.response?.data?.error ||
+      err.message ||
+      "Request failed";
+    return Promise.reject(new Error(msg));
+  }
+);
+
+export default api;
+
