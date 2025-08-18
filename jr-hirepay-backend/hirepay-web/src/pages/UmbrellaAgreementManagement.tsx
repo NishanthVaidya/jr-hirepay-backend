@@ -125,8 +125,12 @@ const UmbrellaAgreementManagement: React.FC = () => {
   };
 
   const getStatusBadge = (status: string) => {
+    // For front office users, show "RECEIVED" instead of "SENT"
+    const displayStatus = (!isBackOffice && status === 'SENT') ? 'RECEIVED' : status;
+    
     const statusColors = {
       'SENT': 'bg-blue-100 text-blue-800',
+      'RECEIVED': 'bg-blue-100 text-blue-800',
       'SIGNED': 'bg-yellow-100 text-yellow-800',
       'APPROVED': 'bg-green-100 text-green-800',
       'REJECTED': 'bg-red-100 text-red-800',
@@ -134,8 +138,8 @@ const UmbrellaAgreementManagement: React.FC = () => {
     };
     
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}>
-        {status}
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[displayStatus as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}>
+        {displayStatus}
       </span>
     );
   };
@@ -289,6 +293,10 @@ const UmbrellaAgreementManagement: React.FC = () => {
         {/* My Agreements Section */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">My Agreements</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            This table shows all umbrella agreements associated with your account. Each row represents a separate agreement with its current status.
+            The "Sign" button only appears for agreements with "RECEIVED" status that you can sign.
+          </p>
           
           {myAgreements.length === 0 ? (
             <div className="text-center py-8">

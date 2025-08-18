@@ -28,6 +28,11 @@ public interface UmbrellaAgreementService {
     UmbrellaAgreementResponse saveToGoogleDrive(String saverEmail, SaveToGoogleDriveRequest request);
 
     /**
+     * Download document
+     */
+    DocumentDownloadResponse downloadDocument(String documentId) throws IOException;
+
+    /**
      * Get all umbrella agreements for a user
      */
     List<UmbrellaAgreementResponse> getUserAgreements(String userEmail);

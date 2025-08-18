@@ -19,11 +19,14 @@ export interface UmbrellaAgreement {
   reviewedBy?: string;
   reviewedAt?: string;
   googleDriveUrl?: string;
+  documentUrl?: string;
+  documentName?: string;
 }
 
 export interface SendUmbrellaAgreementRequest {
   frontOfficeUserId: string;
   notes?: string;
+  document?: File;
 }
 
 export interface SignAgreementRequest {
@@ -51,9 +54,22 @@ export const umbrellaAgreementService = {
     return response.data;
   },
 
-  // Send umbrella agreement to a user
+  // Send umbrella agreement to a user with document attachment
   sendAgreement: async (request: SendUmbrellaAgreementRequest): Promise<UmbrellaAgreement> => {
-    const response = await api.post('/api/umbrella-agreements/send', request);
+    const formData = new FormData();
+    formData.append('frontOfficeUserId', request.frontOfficeUserId);
+    if (request.notes) {
+      formData.append('notes', request.notes);
+    }
+    if (request.document) {
+      formData.append('document', request.document);
+    }
+
+    const response = await api.post('/api/umbrella-agreements/send', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   },
 
@@ -90,6 +106,14 @@ export const umbrellaAgreementService = {
   // Get pending review agreements
   getPendingReviewAgreements: async (): Promise<UmbrellaAgreement[]> => {
     const response = await api.get('/api/umbrella-agreements/pending-review');
+    return response.data;
+  },
+
+  // Download document
+  downloadDocument: async (documentId: string): Promise<Blob> => {
+    const response = await api.get(`/api/umbrella-agreements/${documentId}/download`, {
+      responseType: 'blob',
+    });
     return response.data;
   }
 };

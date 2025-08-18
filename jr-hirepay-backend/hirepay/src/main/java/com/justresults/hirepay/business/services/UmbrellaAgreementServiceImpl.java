@@ -15,13 +15,18 @@ import com.justresults.hirepay.util.DocumentStorageService;
 import com.justresults.hirepay.util.InvalidStateException;
 import com.justresults.hirepay.util.NotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -59,11 +64,22 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
         procedure.setStatus(com.justresults.hirepay.enumeration.ProcedureStatus.DRAFT);
         procedure = procedureRepository.save(procedure);
 
-        // Generate umbrella agreement content
-        byte[] agreementContent = generateUmbrellaAgreementContent(frontOfficeUser);
+        // Handle document upload
+        byte[] agreementContent;
+        String filename;
+        
+        if (request.getDocument() != null && !request.getDocument().isEmpty()) {
+            // Use uploaded document
+            agreementContent = request.getDocument().getBytes();
+            filename = request.getDocument().getOriginalFilename();
+        } else {
+            // Generate default umbrella agreement content
+            agreementContent = generateUmbrellaAgreementContent(frontOfficeUser);
+            filename = "umbrella-agreement.pdf";
+        }
 
         // Store the document
-        String location = documentStorageService.store(procedure.getUuid(), agreementContent, "umbrella-agreement.pdf");
+        String location = documentStorageService.store(procedure.getUuid(), agreementContent, filename);
 
         // Create document record
         ProcedureDocument document = new ProcedureDocument();
@@ -81,7 +97,7 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
         procedure.setStatus(com.justresults.hirepay.enumeration.ProcedureStatus.AGREEMENT_SENT);
         procedureRepository.save(procedure);
 
-        return createUmbrellaAgreementResponse(savedDocument, frontOfficeUser, sentBy);
+        return createUmbrellaAgreementResponse(savedDocument, frontOfficeUser, sentBy, filename);
     }
 
     @Override
@@ -106,18 +122,12 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
         // Store signed document
         String signedLocation = documentStorageService.store(document.getProcedure().getUuid(), signedContent, "signed-umbrella-agreement.pdf");
 
-        // Create new document version
-        ProcedureDocument signedDocument = new ProcedureDocument();
-        signedDocument.setProcedure(document.getProcedure());
-        signedDocument.setDocReference(DocReference.UMBRELLA_AGREEMENT);
-        signedDocument.setLocation(signedLocation);
-        signedDocument.setActorEmail(signerEmail);
-        signedDocument.setStatus(DocumentStatus.SIGNED);
-        signedDocument.setNotes("Signed by: " + request.getSignerName() + " | Reviewed: " + request.getHasReviewed() + 
-                               (request.getNotes() != null ? " | Notes: " + request.getNotes() : ""));
-        signedDocument.setVersion(document.getVersion() + 1);
-
-        ProcedureDocument savedSignedDocument = documentRepository.save(signedDocument);
+        // Update the original document to SIGNED status instead of creating a new one
+        document.setStatus(DocumentStatus.SIGNED);
+        document.setNotes("Signed by: " + request.getSignerName() + " | Reviewed: " + request.getHasReviewed() + 
+                         (request.getNotes() != null ? " | Notes: " + request.getNotes() : ""));
+        
+        ProcedureDocument savedSignedDocument = documentRepository.save(document);
 
         // Update procedure status
         document.getProcedure().setStatus(com.justresults.hirepay.enumeration.ProcedureStatus.AGREEMENT_SIGNED);
@@ -127,7 +137,7 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
         User frontOfficeUser = userRepository.findByEmail(signerEmail)
             .orElseThrow(() -> new NotFoundException("Front office user not found"));
 
-        return createUmbrellaAgreementResponse(savedSignedDocument, frontOfficeUser, document.getActorEmail());
+        return createUmbrellaAgreementResponse(savedSignedDocument, frontOfficeUser, document.getActorEmail(), "signed-umbrella-agreement.pdf");
     }
 
     @Override
@@ -152,7 +162,7 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
         User frontOfficeUser = userRepository.findByEmail(document.getProcedure().getConsultantEmail())
             .orElseThrow(() -> new NotFoundException("Front office user not found"));
 
-        return createUmbrellaAgreementResponse(savedDocument, frontOfficeUser, document.getActorEmail());
+        return createUmbrellaAgreementResponse(savedDocument, frontOfficeUser, document.getActorEmail(), extractDocumentName(document.getLocation()));
     }
 
     @Override
@@ -179,15 +189,59 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
         User frontOfficeUser = userRepository.findByEmail(document.getProcedure().getConsultantEmail())
             .orElseThrow(() -> new NotFoundException("Front office user not found"));
 
-        return createUmbrellaAgreementResponse(savedDocument, frontOfficeUser, document.getActorEmail());
+        return createUmbrellaAgreementResponse(savedDocument, frontOfficeUser, document.getActorEmail(), extractDocumentName(document.getLocation()));
+    }
+
+    @Override
+    public DocumentDownloadResponse downloadDocument(String documentId) throws IOException {
+        // Get the document
+        ProcedureDocument document = documentRepository.findById(Long.valueOf(documentId))
+            .orElseThrow(() -> new NotFoundException("Document not found"));
+
+        // Load the document from storage
+        Resource resource = documentStorageService.loadAsResource(document.getLocation());
+        
+        // Determine content type based on file extension
+        String contentType = determineContentType(document.getLocation());
+        
+        // Extract filename from location
+        String filename = extractDocumentName(document.getLocation());
+
+        return new DocumentDownloadResponse(resource, filename, contentType);
     }
 
     @Override
     public List<UmbrellaAgreementResponse> getUserAgreements(String userEmail) {
+        // Get agreements where the user is the consultant (recipient) or the actor (sender)
         List<ProcedureDocument> documents = documentRepository.findByActorEmailAndDocReferenceOrderByCreatedAtDesc(
             userEmail, DocReference.UMBRELLA_AGREEMENT);
+        
+        // Also get agreements where the user is the consultant (recipient)
+        List<ProcedureDocument> receivedDocuments = documentRepository.findByProcedureConsultantEmailAndDocReferenceOrderByCreatedAtDesc(
+            userEmail, DocReference.UMBRELLA_AGREEMENT);
+        
+        // Combine both lists and remove duplicates
+        Set<Long> seenIds = new HashSet<>();
+        List<ProcedureDocument> allDocuments = new ArrayList<>();
+        
+        for (ProcedureDocument doc : documents) {
+            if (!seenIds.contains(doc.getId())) {
+                allDocuments.add(doc);
+                seenIds.add(doc.getId());
+            }
+        }
+        
+        for (ProcedureDocument doc : receivedDocuments) {
+            if (!seenIds.contains(doc.getId())) {
+                allDocuments.add(doc);
+                seenIds.add(doc.getId());
+            }
+        }
+        
+        // Sort by creation date descending
+        allDocuments.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
 
-        return documents.stream()
+        return allDocuments.stream()
             .map(this::createUmbrellaAgreementResponseFromDocument)
             .collect(Collectors.toList());
     }
@@ -230,7 +284,26 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
         return content.getBytes();
     }
 
-    private UmbrellaAgreementResponse createUmbrellaAgreementResponse(ProcedureDocument document, User frontOfficeUser, String sentBy) {
+    private String determineContentType(String location) {
+        if (location.toLowerCase().endsWith(".pdf")) {
+            return "application/pdf";
+        } else if (location.toLowerCase().endsWith(".doc")) {
+            return "application/msword";
+        } else if (location.toLowerCase().endsWith(".docx")) {
+            return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        } else {
+            return "application/octet-stream";
+        }
+    }
+
+    private String extractDocumentName(String location) {
+        if (location != null && location.contains("/")) {
+            return location.substring(location.lastIndexOf("/") + 1);
+        }
+        return "document";
+    }
+
+    private UmbrellaAgreementResponse createUmbrellaAgreementResponse(ProcedureDocument document, User frontOfficeUser, String sentBy, String documentName) {
         return new UmbrellaAgreementResponse(
             document.getId().toString(),
             document.getStatus().name(),
@@ -242,7 +315,9 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
             document.getStatus() == DocumentStatus.SIGNED ? extractSignerName(document.getNotes()) : null,
             document.getStatus() == DocumentStatus.APPROVED ? document.getActorEmail() : null,
             document.getStatus() == DocumentStatus.APPROVED ? document.getCreatedAt().toString() : null,
-            extractGoogleDriveUrl(document.getNotes())
+            extractGoogleDriveUrl(document.getNotes()),
+            document.getLocation(),
+            documentName
         );
     }
 
@@ -250,7 +325,7 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
         User frontOfficeUser = userRepository.findByEmail(document.getProcedure().getConsultantEmail())
             .orElseThrow(() -> new NotFoundException("Front office user not found"));
 
-        return createUmbrellaAgreementResponse(document, frontOfficeUser, document.getActorEmail());
+        return createUmbrellaAgreementResponse(document, frontOfficeUser, document.getActorEmail(), extractDocumentName(document.getLocation()));
     }
 
     private String extractSignerName(String notes) {

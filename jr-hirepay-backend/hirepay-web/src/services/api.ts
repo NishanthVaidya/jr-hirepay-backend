@@ -12,7 +12,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("authToken");
-    if (token) {
+    // Don't add Authorization header for login and bootstrap endpoints
+    if (token && !config.url?.includes('/api/auth/login') && !config.url?.includes('/api/auth/bootstrap-admin')) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;

@@ -1,13 +1,565 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Cairo:wght@200;300;400;500;600;800;900&display=swap');
+
+:root {
+  box-sizing: border-box;
+  --font-family: "Open Sans", sans-serif;
+  --english-font: "Open Sans", sans-serif;
+  --arabic-font: "Cairo", sans-serif;
+  /*  color */
+  --primary-yellow: rgb(204, 170, 70);
+  --primary-blue: rgb(41, 116, 163, 1);
+  --primary-green: rgb(36, 159, 163, 1);
+  --primary-yellow-light: rgba(204, 170, 70, 0.2);
+  --error-yellow: rgba(240, 191, 76, 0.4);
+  --white: #fff;
+  --main-background: rgb(246, 246, 246);
+  --text-primary: rgba(57, 63, 71, 1);
+  --text-secondary: rgba(49, 48, 48, 1);
+  --black: rgba(0, 0, 0, 1);
+  --light-black: rgba(17, 17, 17, 1);
+  --light-gray: rgba(170, 170, 170, 1);
+  --dark-gray: rgba(157, 157, 157, 1);
+  --green-background: rgba(36, 159, 163, 1);
+  --green-background-light: rgba(36, 159, 163, 0.1);
+  --green-background-hover: hsl(192, 64%, 39%);
+  --green-text: #0F7376 ;
+  --link: #1a73e8;
+  --gray: rgba(238, 238, 238, 1);
+  --gray-50: rgba(238, 238, 238, 0.5);
+  --red: #c62c2c;
+  --red-background: rgba(198, 44, 44, 0.1);
+  --disable-bg: hsl(0, 0%, 85%);
+
+  /* HSL values for Tailwind */
+  --primary-yellow-hsl: 45 54% 54%;
+  --primary-blue-hsl: 203 60% 40%;
+  --primary-green-hsl: 182 64% 39%;
+  --error-yellow-hsl: 43 85% 62%;
+  --main-background-hsl: 0 0% 96%;
+  --text-primary-hsl: 210 11% 25%;
+  --text-secondary-hsl: 0 1% 19%;
+  --black-hsl: 0 0% 0%;
+  --light-black-hsl: 0 0% 7%;
+  --light-gray-hsl: 0 0% 67%;
+  --dark-gray-hsl: 0 0% 62%;
+  --green-background-hsl: 182 64% 39%;
+  --green-text-hsl: 182 64% 39%;
+  --link-hsl: 217 89% 50%;
+  --gray-hsl: 0 0% 93%;
+  --red-hsl: 0 64% 44%;
+
+  /* utilities */
+  --page-width: 414px;
+  --popup-width: 380px;
+  --radius: 4px;
+  --transition-linear: all 0.2s linear;
+  --error-text: #3b609b;
+  --error-background: #d9d9d9;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+:root:lang(ar) {
+  --font-family: "Cairo", sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  font-family: var(--font-family);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+button,
+a,
+a:link,
+a:active {
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  outline: none;
+  background-color: transparent;
+  color: inherit;
+}
+
+/* ZForm Texas Landing Page Styles */
+.zform-teal {
+  color: #20B2AA; /* Light Sea Green - matches teal Z */
+}
+
+.zform-golden {
+  color: #DAA520; /* Goldenrod - matches golden Form */
+}
+
+.zform-blue {
+  background-color: #3B82F6; /* Blue-600 for button */
+}
+
+.zform-blue:hover {
+  background-color: #2563EB; /* Blue-700 for button hover */
+}
+
+/* Ensure proper text rendering */
+.zform-logo {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+.zform-texas {
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+.zform-tagline {
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.zform-button {
+  font-weight: 500;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  line-height: 1.5;
+}
+
+/* Landing Page Specific Styles */
+.landing-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--white);
+  font-family: var(--font-family);
+}
+
+.landing-content {
+  text-align: center;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.landing-welcome {
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  font-weight: 400;
+}
+
+.landing-logo {
+  margin-bottom: 0.75rem;
+}
+
+.landing-logo-text {
+  font-size: 3.75rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+.landing-subtitle {
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.landing-tagline {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin-bottom: 2.5rem;
+}
+
+.landing-button {
+  display: inline-block;
+  background-color: var(--primary-blue);
+  color: var(--white) !important;
+  font-weight: 500;
+  padding: 1rem 2.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  line-height: 1.5;
+  transition: all 0.2s linear;
+  text-decoration: none;
+  border: none;
+}
+
+.landing-button:hover {
+  background-color: hsl(203, 60%, 35%);
+  color: var(--white) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+}
+
+/* ZForm Login Page Styles */
+.zform-login-page {
+  min-height: 100vh;
+  background-color: var(--main-background);
+  font-family: var(--font-family);
+}
+
+.zform-login-header {
+  background-color: var(--primary-yellow);
+  color: var(--white);
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.zform-login-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.zform-login-brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.zform-login-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.zform-language-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.zform-language-active {
+  font-weight: 600;
+  color: var(--white);
+}
+
+.zform-language-inactive {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.zform-signin-button {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s linear;
+}
+
+.zform-signin-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.zform-login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 80px);
+  padding: 2rem 1rem;
+}
+
+.zform-login-card {
+  background-color: var(--white);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--gray);
+  padding: 2rem;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.zform-login-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.zform-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.zform-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.zform-form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.zform-form-input {
+  padding: 0.75rem;
+  border: 1px solid var(--light-gray);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  background-color: var(--white);
+  transition: all 0.2s linear;
+}
+
+.zform-form-input:focus {
+  outline: none;
+  border-color: var(--green-background);
+  box-shadow: 0 0 0 3px rgba(36, 159, 163, 0.1);
+}
+
+.zform-form-input::placeholder {
+  color: var(--light-gray);
+}
+
+.zform-login-button {
+  background-color: var(--green-background);
+  color: var(--white);
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s linear;
+  margin-top: 0.5rem;
+}
+
+.zform-login-button:hover {
+  background-color: var(--green-background-hover);
+}
+
+.zform-login-button:disabled {
+  background-color: var(--disable-bg);
+  color: var(--light-gray);
+  cursor: not-allowed;
+}
+
+.zform-forgot-password {
+  color: var(--green-background);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: right;
+  margin-top: 0.5rem;
+  text-decoration: none;
+}
+
+.zform-forgot-password:hover {
+  color: var(--green-background-hover);
+  text-decoration: underline;
+}
+
+.zform-error-message {
+  background-color: var(--red-background);
+  color: var(--red);
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  border: 1px solid rgba(198, 44, 44, 0.2);
+  margin-bottom: 1rem;
+}
+
+/* ZForm Dashboard Styles */
+.zform-dashboard {
+  background-color: var(--main-background);
+  font-family: var(--font-family);
+  min-height: 100vh;
+}
+
+.zform-dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.zform-dashboard-header {
+  background-color: var(--white);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--gray);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.zform-dashboard-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.zform-dashboard-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.zform-dashboard-icon {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, var(--primary-blue), var(--green-background));
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+}
+
+.zform-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.zform-dashboard-card {
+  background-color: var(--white);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--gray);
+  padding: 1.5rem;
+  transition: all 0.2s linear;
+}
+
+.zform-dashboard-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.zform-card-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.zform-card-icon-blue {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--primary-blue);
+}
+
+.zform-card-icon-green {
+  background-color: rgba(36, 159, 163, 0.1);
+  color: var(--green-background);
+}
+
+.zform-card-icon-purple {
+  background-color: rgba(147, 51, 234, 0.1);
+  color: #9333ea;
+}
+
+.zform-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.zform-card-description {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.zform-card-link {
+  color: var(--green-background);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s linear;
+}
+
+.zform-card-link:hover {
+  color: var(--green-background-hover);
+  text-decoration: underline;
+}
+
+.zform-card-link-blue {
+  color: var(--primary-blue);
+}
+
+.zform-card-link-blue:hover {
+  color: hsl(203, 60%, 35%);
+}
+
+.zform-card-link-green {
+  color: var(--green-background);
+}
+
+.zform-card-link-green:hover {
+  color: var(--green-background-hover);
+}
+
+.zform-card-link-purple {
+  color: #9333ea;
+}
+
+.zform-card-link-purple:hover {
+  color: #7c3aed;
+}
+
+.zform-welcome-card {
+  background-color: var(--white);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--gray);
+  padding: 1.5rem;
+}
+
+.zform-welcome-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.zform-welcome-text {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.zform-welcome-highlight {
+  font-weight: 500;
+  color: var(--text-primary);
 }

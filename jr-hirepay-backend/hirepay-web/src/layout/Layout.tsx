@@ -9,15 +9,25 @@ const Layout: React.FC = () => {
     logout();
   };
 
+  const navigationItems = [
+    { path: '/dashboard/home', label: 'Home', roles: ['ADMIN', 'BACK_OFFICE', 'FRONT_OFFICE'] },
+    { path: '/dashboard/admin', label: 'Admin', roles: ['ADMIN'] },
+    { path: '/dashboard/umbrella-agreements', label: 'Umbrella Agreements', roles: ['ADMIN', 'BACK_OFFICE'] },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navigation */}
       <nav className="bg-blue-600 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
+            {/* Logo */}
             <div className="flex items-center">
-              <Link to="/" className="text-xl font-bold hover:text-blue-200">
-                HirePay
+              <Link to="/dashboard/home" className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">H</span>
+                </div>
+                <span className="text-xl font-bold text-gray-900">HirePay</span>
               </Link>
             </div>
             

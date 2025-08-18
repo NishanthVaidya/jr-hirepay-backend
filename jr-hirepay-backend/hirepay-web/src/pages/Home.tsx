@@ -3,17 +3,30 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Get Hired</h1>
-      <p className="text-gray-700">
-        Welcome! We'll guide you through the hiring flow step by step.
-      </p>
-      <Link
-        to="/get-hired/start"
-        className="inline-flex items-center px-4 py-2 rounded-lg bg-primary-yellow hover:opacity-90"
-      >
-        Start hiring setup
-      </Link>
+    <div className="landing-page">
+      <div className="landing-content">
+        {/* Welcome to */}
+        <p className="landing-welcome">Welcome to</p>
+        
+        {/* Zform Logo */}
+        <div className="landing-logo">
+          <span className="landing-logo-text">
+            <span className="zform-teal">Z</span>
+            <span className="zform-golden">form</span>
+          </span>
+        </div>
+        
+        {/* Internal Tool */}
+        <p className="landing-subtitle">Internal Tool</p>
+        
+        {/* Tagline */}
+        <p className="landing-tagline">Get Hired/ Paid</p>
+        
+        {/* Get Started Button */}
+        <Link to="/login" className="landing-button">
+          Get Started
+        </Link>
+      </div>
     </div>
   );
 }
