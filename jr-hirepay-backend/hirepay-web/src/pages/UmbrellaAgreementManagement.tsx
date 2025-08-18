@@ -146,35 +146,46 @@ const UmbrellaAgreementManagement: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="zform-dashboard">
+        <div className="zform-dashboard-container">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600 font-medium">Loading...</p>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Umbrella Agreement Management</h1>
-          <p className="mt-2 text-gray-600">
-            Welcome, {currentUser?.email} ({currentUser?.designation})
-          </p>
+    <div className="zform-dashboard">
+      <div className="zform-dashboard-container">
+        <div className="zform-dashboard-header">
+          <div className="zform-dashboard-icon">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="zform-dashboard-title">Umbrella Agreement Management</h1>
+            <p className="zform-dashboard-subtitle">
+              Welcome, {currentUser?.email} ({currentUser?.designation})
+            </p>
+          </div>
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-            <p className="text-red-800">{error}</p>
+          <div className="zform-error-message mb-6">
+            {error}
           </div>
         )}
 
         {/* Back Office Section - Send Agreements */}
         {isBackOffice && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Send Umbrella Agreement</h2>
+          <div className="zform-dashboard-card mb-8">
+            <h2 className="zform-card-title">Send Umbrella Agreement</h2>
             
             {frontOfficeUsers.length === 0 ? (
               <div className="text-center py-8">
@@ -187,14 +198,14 @@ const UmbrellaAgreementManagement: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="zform-form-group">
+                  <label className="zform-form-label">
                     Select Front Office User
                   </label>
                   <select
                     value={selectedUser}
                     onChange={(e) => setSelectedUser(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="zform-form-input"
                   >
                     <option value="">Choose a user...</option>
                     {frontOfficeUsers.map((user) => (
@@ -205,15 +216,15 @@ const UmbrellaAgreementManagement: React.FC = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="zform-form-group">
+                  <label className="zform-form-label">
                     Notes (Optional)
                   </label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows={3}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="zform-form-input"
                     placeholder="Add any notes about this agreement..."
                   />
                 </div>
@@ -221,7 +232,7 @@ const UmbrellaAgreementManagement: React.FC = () => {
                 <button
                   onClick={handleSendAgreement}
                   disabled={!selectedUser}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="zform-login-button"
                 >
                   Send Umbrella Agreement
                 </button>
@@ -232,35 +243,35 @@ const UmbrellaAgreementManagement: React.FC = () => {
 
         {/* Pending Reviews Section - Back Office Only */}
         {isBackOffice && pendingReviews.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Pending Reviews</h2>
+          <div className="zform-dashboard-card mb-8">
+            <h2 className="zform-card-title">Pending Reviews</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+                <thead className="bg-gradient-to-r from-blue-50 to-indigo-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
                       User
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
                       Signed At
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-100">
                   {pendingReviews.map((agreement) => (
-                    <tr key={agreement.documentId}>
+                    <tr key={agreement.documentId} className="hover:bg-gray-50 transition-colors duration-200">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-semibold text-gray-900">
                             {agreement.frontOfficeUserName}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-600">
                             {agreement.frontOfficeUserEmail}
                           </div>
                         </div>
@@ -268,7 +279,7 @@ const UmbrellaAgreementManagement: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getStatusBadge(agreement.status)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                         {agreement.signedAt ? new Date(agreement.signedAt).toLocaleDateString() : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -277,7 +288,7 @@ const UmbrellaAgreementManagement: React.FC = () => {
                             setSelectedAgreement(agreement);
                             setShowReviewModal(true);
                           }}
-                          className="text-blue-600 hover:text-blue-900 mr-4"
+                          className="zform-card-link zform-card-link-blue mr-4"
                         >
                           Review
                         </button>
@@ -291,9 +302,9 @@ const UmbrellaAgreementManagement: React.FC = () => {
         )}
 
         {/* My Agreements Section */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">My Agreements</h2>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="zform-dashboard-card">
+          <h2 className="zform-card-title">My Agreements</h2>
+          <p className="zform-card-description mb-4">
             This table shows all umbrella agreements associated with your account. Each row represents a separate agreement with its current status.
             The "Sign" button only appears for agreements with "RECEIVED" status that you can sign.
           </p>
@@ -304,32 +315,32 @@ const UmbrellaAgreementManagement: React.FC = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+                <thead className="bg-gradient-to-r from-blue-50 to-indigo-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
                       User
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
                       Sent At
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-100">
                   {myAgreements.map((agreement) => (
-                    <tr key={agreement.documentId}>
+                    <tr key={agreement.documentId} className="hover:bg-gray-50 transition-colors duration-200">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-semibold text-gray-900">
                             {agreement.frontOfficeUserName}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-600">
                             {agreement.frontOfficeUserEmail}
                           </div>
                         </div>
@@ -337,7 +348,7 @@ const UmbrellaAgreementManagement: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getStatusBadge(agreement.status)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                         {new Date(agreement.sentAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -347,7 +358,7 @@ const UmbrellaAgreementManagement: React.FC = () => {
                               setSelectedAgreement(agreement);
                               setShowSignModal(true);
                             }}
-                            className="text-green-600 hover:text-green-900 mr-4"
+                            className="zform-card-link zform-card-link-green mr-4"
                           >
                             Sign
                           </button>
@@ -355,7 +366,7 @@ const UmbrellaAgreementManagement: React.FC = () => {
                         {agreement.status === 'APPROVED' && isBackOffice && (
                           <button
                             onClick={() => handleSaveToGoogleDrive(agreement.documentId, 'Umbrella Agreements')}
-                            className="text-purple-600 hover:text-purple-900"
+                            className="zform-card-link zform-card-link-purple"
                           >
                             Save to Drive
                           </button>
