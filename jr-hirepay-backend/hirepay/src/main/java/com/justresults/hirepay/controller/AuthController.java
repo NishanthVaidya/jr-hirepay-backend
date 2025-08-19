@@ -35,6 +35,7 @@ public class AuthController {
                 .email(req.email())
                 .passwordHash(encoder.encode(req.password()))
                 .designation("System Administrator")
+                .fullName("System Administrator")
                 .roles(Set.of(Role.ADMIN, Role.BACK_OFFICE))
                 .build();
         users.save(user);
@@ -50,7 +51,8 @@ public class AuthController {
 
         var token = jwt.issue(user.getEmail(), Map.of(
                 "roles", user.getRoles().stream().map(Enum::name).toList(),
-                "designation", user.getDesignation()
+                "designation", user.getDesignation(),
+                "fullName", user.getFullName()
         ));
         return new LoginResponse(token);
     }
@@ -68,6 +70,7 @@ public class AuthController {
                 .email(req.email())
                 .passwordHash(encoder.encode(req.password()))
                 .designation(req.designation() == null ? "Consultant" : req.designation())
+                .fullName(req.fullName())
                 .roles(req.roles() == null ? Set.of(Role.FRONT_OFFICE) : req.roles())
                 .build();
         users.save(u);

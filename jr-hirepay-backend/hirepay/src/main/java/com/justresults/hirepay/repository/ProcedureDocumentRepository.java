@@ -26,4 +26,13 @@ public interface ProcedureDocumentRepository extends JpaRepository<ProcedureDocu
     
     @Query("SELECT pd FROM ProcedureDocument pd WHERE pd.docReference = :docReference AND pd.status = :status ORDER BY pd.createdAt DESC")
     List<ProcedureDocument> findByDocReferenceAndStatusOrderByCreatedAtDesc(@Param("docReference") DocReference docReference, @Param("status") DocumentStatus status);
+    
+    @Query("SELECT pd FROM ProcedureDocument pd WHERE pd.actorEmail = :actorEmail ORDER BY pd.createdAt DESC")
+    List<ProcedureDocument> findByActorEmailOrderByCreatedAtDesc(@Param("actorEmail") String actorEmail);
+    
+    @Query("SELECT pd FROM ProcedureDocument pd WHERE pd.procedure.consultantEmail = :consultantEmail ORDER BY pd.createdAt DESC")
+    List<ProcedureDocument> findByProcedureConsultantEmailOrderByCreatedAtDesc(@Param("consultantEmail") String consultantEmail);
+    
+    @Query("SELECT pd FROM ProcedureDocument pd WHERE pd.status = :status ORDER BY pd.createdAt DESC")
+    List<ProcedureDocument> findByStatusOrderByCreatedAtDesc(@Param("status") DocumentStatus status);
 }

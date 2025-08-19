@@ -13,12 +13,14 @@ export type CreateUserRequest = {
   email: string;
   password: string;
   designation?: string;
+  fullName: string;
   roles?: string[];
 };
 
 export type User = {
   email: string;
   designation: string;
+  fullName: string;
   roles: string[];
 };
 
@@ -62,6 +64,7 @@ const AuthService = {
       return {
         email: payload.sub,
         designation: payload.designation,
+        fullName: payload.fullName || payload.sub, // fallback to email if fullName not present
         roles: payload.roles || [],
       };
     } catch (error) {

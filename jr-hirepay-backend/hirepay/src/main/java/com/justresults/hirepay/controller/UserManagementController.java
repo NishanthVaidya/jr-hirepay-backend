@@ -1,30 +1,68 @@
 package com.justresults.hirepay.controller;
 
 import com.justresults.hirepay.domain.User;
-import com.justresults.hirepay.dto.UserManagementDTOs.*;
+import com.justresults.hirepay.dto.UserManagementDTOs.FrontOfficeUserResponse;
 import com.justresults.hirepay.enumeration.Role;
 import com.justresults.hirepay.repository.UserRepository;
 import com.justresults.hirepay.security.JwtService;
-import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserManagementController {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public UserManagementController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public UserManagementController(UserRepository userRepository, JwtService jwtService) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<UserResponse>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "fullName") String sortBy,
+            @RequestHeader("Authorization") String auth) {
+        
+        // Verify admin access
+        if (auth == null || !auth.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).build();
+        }
+        
+        try {
+            String token = auth.substring(7);
+            var claims = jwtService.parse(token);
+            var roles = claims.get("roles", List.class);
+            
+            if (roles == null || !roles.contains("ADMIN")) {
+                return ResponseEntity.status(403).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortBy));
+        Page<User> users = userRepository.findAll(pageable);
+        
+        Page<UserResponse> userResponses = users.map(user -> new UserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getFullName(),
+                user.getDesignation(),
+                user.getRoles().stream().map(Enum::name).collect(Collectors.toList())
+        ));
+        
+        return ResponseEntity.ok(userResponses);
     }
 
     // Get all front office users (for back office to see)
@@ -36,6 +74,7 @@ public class UserManagementController {
             .map(user -> new FrontOfficeUserResponse(
                 user.getId().toString(),
                 user.getEmail(),
+                user.getFullName(),
                 user.getDesignation(),
                 user.getCreatedAt().toString()
             ))
@@ -44,52 +83,11 @@ public class UserManagementController {
         return ResponseEntity.ok(response);
     }
 
-    // Create new user (admin only)
-    @PostMapping
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
-        // Check if user already exists
-        if (userRepository.existsByEmail(request.getEmail())) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        User user = User.builder()
-            .email(request.getEmail())
-            .passwordHash(passwordEncoder.encode(request.getPassword()))
-            .designation(request.getDesignation())
-            .roles(request.getRoles())
-            .build();
-
-        User savedUser = userRepository.save(user);
-        
-        UserResponse response = new UserResponse(
-            savedUser.getId().toString(),
-            savedUser.getEmail(),
-            savedUser.getDesignation(),
-            savedUser.getRoles().stream().map(Enum::name).toList(),
-            savedUser.getCreatedAt().toString()
-        );
-        
-        return ResponseEntity.ok(response);
-    }
-
-    // Get user by ID
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable String userId) {
-        User user = userRepository.findById(Long.valueOf(userId))
-            .orElse(null);
-        
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-        
-        UserResponse response = new UserResponse(
-            user.getId().toString(),
-            user.getEmail(),
-            user.getDesignation(),
-            user.getRoles().stream().map(Enum::name).toList(),
-            user.getCreatedAt().toString()
-        );
-        
-        return ResponseEntity.ok(response);
-    }
+    public record UserResponse(
+            Long id,
+            String email,
+            String fullName,
+            String designation,
+            List<String> roles
+    ) {}
 }

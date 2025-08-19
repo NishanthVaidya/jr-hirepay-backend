@@ -12,5 +12,6 @@ public class AuthDTOs {
     public record CreateUserRequest(@Email String email,
                                     @NotBlank String password,
                                     String designation,
+                                    @NotBlank String fullName,
                                     Set<Role> roles) {}
 }

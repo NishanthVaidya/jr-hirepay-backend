@@ -1,0 +1,1117 @@
+/* Zform Document Management Styles - Comprehensive Refactor */
+
+:root {
+    /* Zform Design System Variables */
+    --z-container-max: 1200px;
+    --z-spacing-xs: 4px;
+    --z-spacing-sm: 8px;
+    --z-spacing-md: 12px;
+    --z-spacing-lg: 16px;
+    --z-spacing-xl: 24px;
+    --z-spacing-2xl: 32px;
+    --z-spacing-3xl: 48px;
+    
+    /* Zform Border Radius */
+    --z-radius-sm: 6px;
+    --z-radius-md: 8px;
+    --z-radius-lg: 12px;
+    --z-radius-xl: 16px;
+    
+    /* Zform Shadows */
+    --z-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --z-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --z-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --z-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+    
+    /* Zforms Color Scheme */
+    --zforms-bg: #0f172a;         /* dark navy background */
+    --zforms-surface: #1e293b;    /* card/panel background */
+    --zforms-border: #004155;     /* subtle borders */
+    --zforms-accent: #38bdf8;     /* primary accent (buttons, highlights) */
+    --zforms-accent-hover: #0ea5e9; 
+    --zforms-text: #f1f5f9;       /* main text */
+    --zforms-muted: #94a3b8;      /* muted/secondary text */
+    --zforms-success: #10b981;    /* success states */
+    --zforms-warning: #f59e0b;    /* warning states */
+    --zforms-error: #ef4444;      /* error states */
+    --zforms-radius: 12px;
+    --zforms-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    
+    /* Legacy Zform Colors - keeping for compatibility */
+    --z-white: #ffffff;
+    --z-gray-50: #f8fafc;
+    --z-gray-100: #f1f5f9;
+    --z-gray-200: #e2e8f0;
+    --z-gray-300: #cbd5e1;
+    --z-gray-400: #94a3b8;
+    --z-gray-500: #64748b;
+    --z-gray-600: #475569;
+    --z-gray-700: #334155;
+    --z-gray-800: #1e293b;
+    --z-gray-900: #0f172a;
+    
+    /* Legacy Zform Semantic Colors - keeping for compatibility */
+    --z-primary: #6366f1;
+    --z-primary-light: #e0e7ff;
+    --z-primary-dark: #4338ca;
+    --z-success: #059669;
+    --z-success-light: #d1fae5;
+    --z-success-dark: #047857;
+    --z-warning: #d97706;
+    --z-warning-light: #fef3c7;
+    --z-warning-dark: #b45309;
+    --z-danger: #dc2626;
+    --z-danger-light: #fee2e2;
+    --z-danger-dark: #b91c1c;
+    --z-info: #0891b2;
+    --z-info-light: #cffafe;
+    --z-info-dark: #0e7490;
+    
+    /* Zform Typography */
+    --z-font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --z-font-size-xs: 0.75rem;
+    --z-font-size-sm: 0.875rem;
+    --z-font-size-base: 1rem;
+    --z-font-size-lg: 1.125rem;
+    --z-font-size-xl: 1.25rem;
+    --z-font-size-2xl: 1.5rem;
+    --z-font-size-3xl: 1.875rem;
+    
+    /* Zform Icon Sizes */
+    --z-icon-sm: 32px;
+    --z-icon-md: 40px;
+    --z-icon-lg: 48px;
+    
+    /* Zform Transitions */
+    --z-transition-fast: 150ms ease-in-out;
+    --z-transition-base: 200ms ease-in-out;
+    --z-transition-slow: 300ms ease-in-out;
+  }
+  
+  /* Base Zform Container */
+  .zforms {
+    width: 100%;
+    max-width: var(--z-container-max);
+    margin: 0 auto;
+    padding: var(--z-spacing-xl);
+    font-family: var(--z-font-family);
+    color: var(--zforms-text);
+    background: var(--zforms-bg);
+  }
+  
+  .zforms__section {
+    background: var(--zforms-surface);
+    border-radius: var(--zforms-radius);
+    box-shadow: var(--zforms-shadow);
+    overflow: hidden;
+    border: 1px solid var(--zforms-border);
+  }
+  
+  /* Zform Header Styles */
+  .zforms__header {
+    padding: var(--z-spacing-2xl) var(--z-spacing-2xl) var(--z-spacing-lg);
+    border-bottom: 1px solid var(--zforms-border);
+    background: var(--zforms-surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .zforms__title {
+    font-size: var(--z-font-size-2xl);
+    font-weight: 600;
+    color: var(--zforms-text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--z-spacing-md);
+  }
+  
+  .zforms__badge {
+    background: var(--zforms-accent);
+    color: var(--zforms-bg);
+    font-size: var(--z-font-size-xs);
+    font-weight: 600;
+    padding: var(--z-spacing-xs) var(--z-spacing-sm);
+    border-radius: var(--zforms-radius);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .zforms__lead {
+    padding: var(--z-spacing-lg) var(--z-spacing-2xl) var(--z-spacing-2xl);
+    margin: 0;
+    color: var(--zforms-muted);
+    line-height: 1.6;
+    font-size: var(--z-font-size-sm);
+  }
+  
+  /* Zform Table Structure */
+  .zforms__table {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .zforms__head {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+    gap: var(--z-spacing-lg);
+    padding: var(--z-spacing-lg) var(--z-spacing-2xl);
+    background: var(--zforms-surface);
+    border-bottom: 2px solid var(--zforms-border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-weight: 600;
+    font-size: var(--z-font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--zforms-muted);
+  }
+  
+  .zforms__head .zforms__cell {
+    padding: var(--z-spacing-md) 0;
+    font-weight: 600;
+    color: var(--zforms-muted);
+  }
+  
+  /* Zform Row Styles */
+  .z-row {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+    gap: var(--z-spacing-lg);
+    padding: var(--z-spacing-lg) var(--z-spacing-2xl);
+    border-bottom: 1px solid var(--zforms-border);
+    transition: all var(--z-transition-base);
+    min-height: 80px;
+    align-items: center;
+    background: var(--zforms-surface);
+  }
+  
+  .z-row:hover {
+    background: var(--zforms-bg);
+    box-shadow: var(--zforms-shadow);
+    transform: translateY(-1px);
+  }
+  
+  .z-row--even {
+    background: var(--zforms-surface);
+  }
+  
+  .z-row--odd {
+    background: var(--zforms-bg);
+  }
+  
+  /* Zform Cell Base Styles */
+  .zforms__cell {
+    padding: var(--z-spacing-md) 0;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  
+  /* Zform Icon Container - Normalized Sizing */
+  .z-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--z-icon-lg);
+    height: var(--z-icon-lg);
+    border-radius: var(--zforms-radius);
+    background: var(--zforms-bg);
+    margin-right: var(--z-spacing-md);
+    flex-shrink: 0;
+    transition: all var(--z-transition-base);
+    box-shadow: var(--zforms-shadow);
+  }
+  
+  .z-icon:hover {
+    box-shadow: var(--zforms-shadow);
+    transform: translateY(-1px);
+  }
+  
+  .z-icon img,
+  .z-icon svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: var(--z-radius-sm);
+    padding: var(--z-spacing-sm);
+  }
+  
+  /* Zform File Column */
+  .zforms__file {
+    display: flex;
+    align-items: center;
+    gap: var(--z-spacing-md);
+  }
+  
+  .zforms__file-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--z-spacing-xs);
+    min-width: 0;
+    flex: 1;
+  }
+  
+  .zforms__file-title {
+    font-size: var(--z-font-size-sm);
+    font-weight: 600;
+    color: var(--zforms-text);
+    margin: 0;
+    line-height: 1.4;
+  }
+  
+  .zforms__file-link {
+    display: flex;
+    align-items: center;
+    gap: var(--z-spacing-xs);
+    color: var(--zforms-accent);
+    text-decoration: none;
+    font-size: var(--z-font-size-sm);
+    transition: all var(--z-transition-fast);
+    padding: var(--z-spacing-xs) var(--z-spacing-sm);
+    border-radius: var(--zforms-radius);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .zforms__file-link:hover {
+    background: var(--zforms-accent);
+    color: var(--zforms-bg);
+    transform: translateY(-1px);
+  }
+  
+  .zforms__file-link:focus-visible {
+    outline: 2px solid var(--zforms-accent);
+    outline-offset: 2px;
+    border-radius: var(--zforms-radius);
+  }
+  
+  .zforms__file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+  }
+  
+  /* Zform User Column */
+  .zforms__user {
+    display: flex;
+    flex-direction: column;
+    gap: var(--z-spacing-xs);
+    min-width: 0;
+  }
+  
+  .zforms__user-name {
+    font-size: var(--z-font-size-sm);
+    font-weight: 600;
+    color: var(--zforms-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .zforms__user-email {
+    font-size: var(--z-font-size-sm);
+    color: var(--zforms-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Zform Status Column */
+  .zforms__status {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Zform Status Badges */
+  .zforms__badge--status {
+    padding: var(--z-spacing-xs) var(--z-spacing-sm);
+    border-radius: var(--zforms-radius);
+    font-size: var(--z-font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid transparent;
+  }
+  
+  .zforms__badge--signed {
+    background: var(--zforms-success);
+    color: var(--zforms-bg);
+    border-color: var(--zforms-success);
+  }
+  
+  .zforms__badge--pending {
+    background: var(--zforms-warning);
+    color: var(--zforms-bg);
+    border-color: var(--z-warning);
+  }
+  
+  .zforms__badge--rejected {
+    background: var(--zforms-error);
+    color: var(--zforms-bg);
+    border-color: var(--zforms-error);
+  }
+  
+  .zforms__badge--sent {
+    background: var(--zforms-accent);
+    color: var(--zforms-bg);
+    border-color: var(--zforms-accent);
+  }
+  
+  .zforms__badge--approved {
+    background: var(--zforms-success);
+    color: var(--zforms-bg);
+    border-color: var(--zforms-success);
+  }
+  
+  /* Zform Date Column */
+  .zforms__date {
+    font-size: var(--z-font-size-sm);
+    color: var(--zforms-muted);
+  }
+  
+  /* Zform Actions Column */
+  .zforms__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--z-spacing-sm);
+    justify-content: flex-end;
+  }
+  
+  .zforms__button {
+    padding: var(--z-spacing-sm) var(--z-spacing-lg);
+    border-radius: var(--zforms-radius);
+    font-size: var(--z-font-size-sm);
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all var(--z-transition-base);
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-family: inherit;
+  }
+  
+  .zforms__button--primary {
+    background: var(--zforms-accent);
+    color: var(--zforms-bg);
+  }
+  
+  .zforms__button--primary:hover {
+    background: var(--zforms-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--zforms-shadow);
+  }
+  
+  .zforms__button--success {
+    background: var(--zforms-success);
+    color: var(--zforms-bg);
+  }
+  
+  .zforms__button--success:hover {
+    background: var(--zforms-success);
+    transform: translateY(-1px);
+    box-shadow: var(--zforms-shadow);
+  }
+  
+  .zforms__button--warning {
+    background: var(--zforms-warning);
+    color: var(--zforms-bg);
+  }
+  
+  .zforms__button--warning:hover {
+    background: var(--zforms-warning);
+    transform: translateY(-1px);
+    box-shadow: var(--zforms-shadow);
+  }
+  
+  .zforms__button:focus-visible {
+    outline: 2px solid var(--zforms-accent);
+    outline-offset: 2px;
+    border-radius: var(--zforms-radius);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1023px) {
+    .zforms__head {
+      grid-template-columns: 2fr 1.5fr 1fr 1fr;
+    }
+    
+    .z-row {
+      grid-template-columns: 2fr 1.5fr 1fr 1fr;
+    }
+    
+    .zforms__date {
+      display: none;
+    }
+    
+    .zforms__actions {
+      grid-column: 4;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: var(--z-spacing-sm);
+    }
+    
+    .zforms__button {
+      width: 100%;
+      max-width: 120px;
+    }
+    
+    /* Tablet Icon Sizing */
+    .z-icon {
+      width: var(--z-icon-md);
+      height: var(--z-icon-md);
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .zforms {
+      padding: var(--z-spacing-lg);
+    }
+    
+    .zforms__section {
+      border-radius: var(--z-radius-lg);
+    }
+    
+    .zforms__header {
+      padding: var(--z-spacing-lg);
+    }
+    
+    .zforms__lead {
+      padding: 0 var(--z-spacing-lg) var(--z-spacing-lg);
+    }
+    
+    .zforms__head {
+      display: none;
+    }
+    
+    .z-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--z-spacing-md);
+      padding: var(--z-spacing-lg);
+      margin-bottom: var(--z-spacing-lg);
+      border: 1px solid var(--zforms-border);
+      border-radius: var(--zforms-radius);
+      background: var(--zforms-surface);
+      box-shadow: var(--zforms-shadow);
+    }
+    
+    .z-row:hover {
+      transform: none;
+      box-shadow: var(--zforms-shadow);
+    }
+    
+    .zforms__cell {
+      padding: 0;
+      border-bottom: 1px solid var(--zforms-border);
+      padding-bottom: var(--z-spacing-md);
+    }
+    
+    .zforms__cell:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
+    /* Mobile Icon Sizing */
+    .z-icon {
+      width: var(--z-icon-sm);
+      height: var(--z-icon-sm);
+    }
+    
+    .zforms__file {
+      order: 1;
+    }
+    
+    .zforms__user {
+      order: 2;
+    }
+    
+    .zforms__status {
+      order: 3;
+    }
+    
+    .zforms__date {
+      order: 4;
+      display: block;
+    }
+    
+    .zforms__actions {
+      order: 5;
+      justify-content: flex-start;
+      flex-direction: row;
+      gap: var(--z-spacing-md);
+    }
+    
+    .zforms__button {
+      flex: 1;
+      max-width: none;
+    }
+    
+    /* Mobile Card Labels */
+    .zforms__cell::before {
+      content: attr(data-label);
+      display: block;
+      font-size: var(--z-font-size-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--zforms-muted);
+      margin-bottom: var(--z-spacing-xs);
+    }
+    
+    .zforms__file::before {
+      content: "Document Type";
+    }
+    
+    .zforms__user::before {
+      content: "User";
+    }
+    
+    .zforms__status::before {
+      content: "Status";
+    }
+    
+    .zforms__date::before {
+      content: "Updated On";
+    }
+    
+    .zforms__actions::before {
+      content: "Actions";
+    }
+  }
+  
+  /* Dark Mode Support */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --z-white: #1f2937;
+      --z-gray-50: #374151;
+      --z-gray-100: #4b5563;
+      --z-gray-200: #6b7280;
+      --z-gray-300: #9ca3af;
+      --z-gray-400: #d1d5db;
+      --z-gray-500: #e5e7eb;
+      --z-gray-600: #f3f4f6;
+      --z-gray-700: #f9fafb;
+      --z-gray-800: #ffffff;
+      --z-gray-900: #ffffff;
+    }
+    
+    .z-row--even {
+      background: var(--z-white);
+    }
+    
+    .z-row--odd {
+      background: var(--z-gray-50);
+    }
+    
+    .z-row:hover {
+      background: var(--z-gray-100);
+    }
+    
+    .z-icon {
+      background: var(--z-gray-100);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: reduce) {
+    .z-row,
+    .z-row:hover,
+    .zforms__button,
+    .zforms__file-link,
+    .z-icon {
+      transition: none;
+      transform: none;
+    }
+  }
+  
+  /* Focus Management */
+  .zforms__button:focus-visible,
+  .zforms__file-link:focus-visible {
+    outline: 2px solid var(--z-primary);
+    outline-offset: 2px;
+    border-radius: var(--z-radius-md);
+  }
+  
+  /* Print Styles */
+  @media print {
+    .zforms {
+      box-shadow: none;
+      border: 1px solid #000;
+    }
+    
+    .zforms__section {
+      box-shadow: none;
+      border: 1px solid #000;
+    }
+    
+    .z-row:hover {
+      background: transparent !important;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+    
+    .zforms__button {
+      border: 1px solid #000;
+      background: transparent;
+      color: #000;
+    }
+    
+    .zforms__file-link {
+      text-decoration: underline;
+      color: #000;
+    }
+    
+    .z-icon {
+      background: transparent;
+      box-shadow: none;
+      border: 1px solid #000;
+    }
+  }
+  
+  /* Accessibility Enhancements */
+  .zforms__table:focus-within {
+    outline: 2px solid var(--z-primary);
+    outline-offset: 2px;
+    border-radius: var(--z-radius-md);
+  }
+  
+  /* High Contrast Mode */
+  @media (prefers-contrast: high) {
+    .z-row {
+      border-bottom: 2px solid var(--z-gray-900);
+    }
+    
+    .zforms__head {
+      border-bottom: 3px solid var(--z-gray-900);
+    }
+    
+    .zforms__button {
+      border: 2px solid var(--z-gray-900);
+    }
+    
+    .z-icon {
+      border: 2px solid var(--z-gray-900);
+      background: var(--z-white);
+    }
+  }
+  
+  /* Loading States */
+  .z-row--loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  
+  .z-row--loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--z-gray-300);
+    border-top: 2px solid var(--z-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Empty State Enhancements */
+  .zforms__empty {
+    text-align: center;
+    padding: var(--z-spacing-3xl) var(--z-spacing-xl);
+    color: var(--zforms-muted);
+  }
+  
+  .zforms__empty svg {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto var(--z-spacing-lg);
+    opacity: 0.5;
+  }
+  
+  /* Form Content Layout */
+  .zforms__content {
+    padding: var(--z-spacing-2xl);
+  }
+  
+  .zforms__form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--z-spacing-xl);
+    margin-bottom: var(--z-spacing-xl);
+  }
+  
+  .zforms__form-field {
+    margin-bottom: var(--z-spacing-xl);
+  }
+  
+  .zforms__form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--zforms-text);
+    margin-bottom: var(--z-spacing-sm);
+    font-size: var(--z-font-size-sm);
+  }
+  
+  .zforms__form-input,
+  .zforms__form-textarea {
+    width: 100%;
+    padding: var(--z-spacing-md);
+    border: 1px solid var(--zforms-border);
+    border-radius: var(--zforms-radius);
+    font-size: var(--z-font-size-sm);
+    font-family: var(--z-font-family);
+    background: var(--zforms-bg);
+    color: var(--zforms-text);
+    transition: var(--z-transition-base);
+  }
+  
+  .zforms__form-input:focus,
+  .zforms__form-textarea:focus {
+    outline: none;
+    border-color: var(--zforms-accent);
+    box-shadow: 0 0 0 3px var(--zforms-accent);
+  }
+  
+  .zforms__form-textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  /* File Upload Area */
+  .zforms__upload-area {
+    border: 2px dashed var(--zforms-border);
+    border-radius: var(--zforms-radius);
+    padding: var(--z-spacing-2xl);
+    text-align: center;
+    background: var(--zforms-bg);
+    transition: var(--z-transition-base);
+    cursor: pointer;
+  }
+  
+  .zforms__upload-area:hover {
+    border-color: var(--zforms-accent);
+    background: var(--zforms-surface);
+  }
+  
+  .zforms__file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  .zforms__upload-label {
+    cursor: pointer;
+    display: block;
+  }
+  
+  .zforms__upload-icon {
+    margin-bottom: var(--z-spacing-lg);
+    color: var(--zforms-muted);
+    width: var(--z-icon-sm);
+    height: var(--z-icon-sm);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .zforms__upload-text {
+    font-size: var(--z-font-size-sm);
+    color: var(--zforms-muted);
+    margin-bottom: var(--z-spacing-sm);
+  }
+  
+  .zforms__upload-link {
+    font-weight: 600;
+    color: var(--zforms-accent);
+    text-decoration: underline;
+  }
+  
+  .zforms__upload-hint {
+    font-size: var(--z-font-size-xs);
+    color: var(--zforms-muted);
+  }
+  
+  /* File Preview */
+  .zforms__file-preview {
+    margin-top: var(--z-spacing-md);
+    padding: var(--z-spacing-md);
+    background: var(--zforms-success);
+    border: 1px solid var(--zforms-success);
+    border-radius: var(--zforms-radius);
+  }
+  
+  .zforms__file-info {
+    display: flex;
+    align-items: center;
+    gap: var(--z-spacing-sm);
+  }
+  
+  .zforms__file-info svg {
+    color: var(--zforms-bg);
+    flex-shrink: 0;
+  }
+  
+  .zforms__file-name {
+    font-size: var(--z-font-size-sm);
+    color: var(--zforms-bg);
+    font-weight: 500;
+  }
+  
+  /* Form Actions */
+  .zforms__form-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: var(--z-spacing-xl);
+    border-top: 1px solid var(--zforms-border);
+    margin-top: var(--z-spacing-xl);
+  }
+  
+  .zforms__form-actions .zforms__button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--z-spacing-sm);
+    min-width: 140px;
+  }
+  
+  .zforms__form-actions .zforms__button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* Responsive Form Grid */
+  @media (max-width: 768px) {
+    .zforms__form-grid {
+      grid-template-columns: 1fr;
+      gap: var(--z-spacing-lg);
+    }
+    
+    .zforms__content {
+      padding: var(--z-spacing-xl);
+    }
+    
+    .zforms__upload-area {
+      padding: var(--z-spacing-xl);
+    }
+  }
+  
+  /* Utility Classes */
+  .zforms__truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .zforms__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  /* Review Section Styles */
+.z-row--review-expanded {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.zforms__review-section {
+  padding: 1.5rem;
+  background: var(--surface);
+}
+
+.zforms__review-content {
+  max-width: 100%;
+}
+
+.zforms__review-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.zforms__review-info {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.zforms__review-info-item {
+  color: var(--text);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.zforms__review-info-item:last-child {
+  margin-bottom: 0;
+}
+
+.zforms__review-form {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.zforms__review-decision {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 150px;
+}
+
+.zforms__review-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.zforms__review-radio-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.zforms__review-radio {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.zforms__radio-input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--accent);
+}
+
+.zforms__radio-label {
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.zforms__review-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.zforms__review-textarea {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  resize: vertical;
+}
+
+.zforms__review-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+}
+
+.zforms__review-textarea::placeholder {
+  color: var(--muted);
+}
+
+.zforms__review-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  min-width: 200px;
+}
+
+.zforms__button--secondary {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.zforms__button--secondary:hover {
+  background: var(--border);
+}
+
+.zforms__button--success {
+  background: var(--success);
+  color: white;
+}
+
+.zforms__button--success:hover {
+  background: #059669;
+}
+
+.zforms__button--danger {
+  background: var(--error);
+  color: white;
+}
+
+.zforms__button--danger:hover {
+  background: #dc2626;
+}
+
+/* Responsive adjustments for review section */
+@media (max-width: 1024px) {
+  .zforms__review-form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .zforms__review-actions {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 768px) {
+  .zforms__review-radio-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .zforms__review-actions {
+    flex-direction: column;
+  }
+  
+  .zforms__review-actions .zforms__button {
+    width: 100%;
+  }
+}
+  
+  
+  
+  

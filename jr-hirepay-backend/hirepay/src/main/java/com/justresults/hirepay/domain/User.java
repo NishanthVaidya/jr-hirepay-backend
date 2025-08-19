@@ -28,6 +28,9 @@ public class User {
     @Column(nullable=false, length=100)
     private String designation;
 
+    @Column(nullable=false, length=200)
+    private String fullName;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name="user_id"))
     @Enumerated(EnumType.STRING)

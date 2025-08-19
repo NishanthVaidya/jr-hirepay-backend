@@ -9,7 +9,7 @@ export default function DashboardHome() {
     <div className="zform-dashboard">
       <div className="zform-dashboard-container">
         {/* Header */}
-        <div className="zform-dashboard-header">
+        <div className="zform-dashboard-header mb-10">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="zform-dashboard-title">Get Hired</h1>
@@ -24,8 +24,8 @@ export default function DashboardHome() {
         </div>
 
         {/* Quick Actions */}
-        <div className="zform-dashboard-grid">
-          {/* Umbrella Agreements Card */}
+        <div className="zform-dashboard-grid mb-12">
+          {/* Document Management Card */}
           {(currentUser?.roles.includes("ADMIN") || currentUser?.roles.includes("BACK_OFFICE")) && (
             <div className="zform-dashboard-card">
               <div className="zform-card-icon zform-card-icon-blue">
@@ -33,15 +33,15 @@ export default function DashboardHome() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3 className="zform-card-title">Umbrella Agreements</h3>
+              <h3 className="zform-card-title">Document Management</h3>
               <p className="zform-card-description">
-                Manage umbrella agreements, send to employees, and track signing status.
+                Send documents to employees, track signing status, and manage approvals for all document types.
               </p>
               <Link
-                to="/dashboard/umbrella-agreements"
+                to="/dashboard/documents"
                 className="zform-card-link zform-card-link-blue"
               >
-                Manage Agreements
+                Manage Documents
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -74,35 +74,37 @@ export default function DashboardHome() {
             </div>
           )}
 
-          {/* Document Management Card */}
-          <div className="zform-dashboard-card">
-            <div className="zform-card-icon zform-card-icon-purple">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
+          {/* My Documents Card - For Front Office Users */}
+          {currentUser?.roles.includes("FRONT_OFFICE") && (
+            <div className="zform-dashboard-card">
+              <div className="zform-card-icon zform-card-icon-purple">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <h3 className="zform-card-title">My Documents</h3>
+              <p className="zform-card-description">
+                View documents sent to you, sign agreements, and track your document status.
+              </p>
+              <Link
+                to="/dashboard/documents"
+                className="zform-card-link zform-card-link-purple"
+              >
+                View My Documents
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
             </div>
-            <h3 className="zform-card-title">Document Management</h3>
-            <p className="zform-card-description">
-              View and manage all your documents, track status, and handle approvals.
-            </p>
-            <Link
-              to="/dashboard/umbrella-agreements"
-              className="zform-card-link zform-card-link-purple"
-            >
-              View Documents
-              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
+          )}
         </div>
 
         {/* Welcome Message */}
         <div className="zform-welcome-card">
-          <h2 className="zform-welcome-title">Welcome, {currentUser?.designation}!</h2>
-          <p className="zform-welcome-text">
+          <h2 className="zform-welcome-title mb-4">Welcome, {currentUser?.designation}!</h2>
+          <p className="zform-welcome-text leading-relaxed">
             You're logged in as <span className="zform-welcome-highlight">{currentUser?.email}</span> with the following roles: 
-            <span className="zform-welcome-highlight ml-1">
+            <span className="zform-welcome-highlight ml-2">
               {currentUser?.roles.join(', ')}
             </span>
           </p>

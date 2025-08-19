@@ -32,18 +32,21 @@ public class UserManagementDTOs {
     public static class FrontOfficeUserResponse {
         private String id;
         private String email;
+        private String fullName;
         private String designation;
         private String createdAt;
 
-        public FrontOfficeUserResponse(String id, String email, String designation, String createdAt) {
+        public FrontOfficeUserResponse(String id, String email, String fullName, String designation, String createdAt) {
             this.id = id;
             this.email = email;
+            this.fullName = fullName;
             this.designation = designation;
             this.createdAt = createdAt;
         }
 
         public String getId() { return id; }
         public String getEmail() { return email; }
+        public String getFullName() { return fullName; }
         public String getDesignation() { return designation; }
         public String getCreatedAt() { return createdAt; }
     }

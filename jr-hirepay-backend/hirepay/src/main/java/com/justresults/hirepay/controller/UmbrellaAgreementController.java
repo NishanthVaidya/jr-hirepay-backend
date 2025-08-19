@@ -32,7 +32,8 @@ public class UmbrellaAgreementController {
             @RequestHeader("Authorization") String authHeader,
             @RequestParam("frontOfficeUserId") String frontOfficeUserId,
             @RequestParam(value = "notes", required = false) String notes,
-            @RequestParam(value = "document", required = false) MultipartFile document) throws IOException {
+            @RequestParam(value = "document", required = false) MultipartFile document,
+            @RequestParam(value = "documentType", required = false) String documentType) throws IOException {
         
         try {
             // Validate required fields
@@ -49,12 +50,14 @@ public class UmbrellaAgreementController {
             System.out.println("Sending agreement - sentBy: " + sentBy);
             System.out.println("frontOfficeUserId: " + frontOfficeUserId);
             System.out.println("notes: " + notes);
+            System.out.println("documentType: " + documentType);
             System.out.println("document: " + (document != null ? document.getOriginalFilename() : "null"));
             
             SendUmbrellaAgreementRequest request = new SendUmbrellaAgreementRequest(
                 frontOfficeUserId, 
                 notes, 
-                document
+                document,
+                documentType
             );
             
             UmbrellaAgreementResponse response = umbrellaAgreementService.sendAgreement(sentBy, request);

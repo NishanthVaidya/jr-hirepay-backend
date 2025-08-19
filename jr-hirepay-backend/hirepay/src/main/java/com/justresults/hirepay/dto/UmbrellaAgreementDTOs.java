@@ -11,11 +11,13 @@ public class UmbrellaAgreementDTOs {
         private String frontOfficeUserId;
         private String notes;
         private MultipartFile document;
+        private String documentType;
 
-        public SendUmbrellaAgreementRequest(String frontOfficeUserId, String notes, MultipartFile document) {
+        public SendUmbrellaAgreementRequest(String frontOfficeUserId, String notes, MultipartFile document, String documentType) {
             this.frontOfficeUserId = frontOfficeUserId;
             this.notes = notes;
             this.document = document;
+            this.documentType = documentType;
         }
 
         public String getFrontOfficeUserId() { return frontOfficeUserId; }
@@ -24,6 +26,8 @@ public class UmbrellaAgreementDTOs {
         public void setNotes(String notes) { this.notes = notes; }
         public MultipartFile getDocument() { return document; }
         public void setDocument(MultipartFile document) { this.document = document; }
+        public String getDocumentType() { return documentType; }
+        public void setDocumentType(String documentType) { this.documentType = documentType; }
     }
 
     public static class SignAgreementRequest {
@@ -102,12 +106,13 @@ public class UmbrellaAgreementDTOs {
         private String googleDriveUrl;
         private String documentUrl;
         private String documentName;
+        private String documentType;
 
         public UmbrellaAgreementResponse(String documentId, String status, String frontOfficeUserEmail, 
                                        String frontOfficeUserName, String sentBy, String sentAt, 
                                        String signedAt, String signerName, String reviewedBy, 
                                        String reviewedAt, String googleDriveUrl, String documentUrl, 
-                                       String documentName) {
+                                       String documentName, String documentType) {
             this.documentId = documentId;
             this.status = status;
             this.frontOfficeUserEmail = frontOfficeUserEmail;
@@ -121,6 +126,7 @@ public class UmbrellaAgreementDTOs {
             this.googleDriveUrl = googleDriveUrl;
             this.documentUrl = documentUrl;
             this.documentName = documentName;
+            this.documentType = documentType;
         }
 
         // Getters
@@ -137,5 +143,6 @@ public class UmbrellaAgreementDTOs {
         public String getGoogleDriveUrl() { return googleDriveUrl; }
         public String getDocumentUrl() { return documentUrl; }
         public String getDocumentName() { return documentName; }
+        public String getDocumentType() { return documentType; }
     }
 }

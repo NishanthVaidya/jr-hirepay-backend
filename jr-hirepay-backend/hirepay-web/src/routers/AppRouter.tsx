@@ -5,7 +5,7 @@ import Home from '../pages/Home';
 import DashboardHome from '../pages/DashboardHome';
 import Login from '../pages/Login';
 import Admin from '../pages/Admin';
-import UmbrellaAgreementManagement from '../pages/UmbrellaAgreementManagement';
+import DocumentManagement from '../pages/UmbrellaAgreementManagement';
 import { useAuth } from '../contexts/AuthContext';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -33,7 +33,7 @@ const AppRouter: React.FC = () => {
           <Route index element={<Navigate to="/dashboard/home" replace />} />
           <Route path="home" element={<DashboardHome />} />
           <Route path="admin" element={<Admin />} />
-          <Route path="umbrella-agreements" element={<UmbrellaAgreementManagement />} />
+          <Route path="documents" element={<DocumentManagement />} />
         </Route>
       </Routes>
     </Router>

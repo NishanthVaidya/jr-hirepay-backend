@@ -81,10 +81,13 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
         // Store the document
         String location = documentStorageService.store(procedure.getUuid(), agreementContent, filename);
 
+        // Determine document reference based on document type
+        DocReference docReference = determineDocReference(request.getDocumentType());
+
         // Create document record
         ProcedureDocument document = new ProcedureDocument();
         document.setProcedure(procedure);
-        document.setDocReference(DocReference.UMBRELLA_AGREEMENT);
+        document.setDocReference(docReference);
         document.setLocation(location);
         document.setActorEmail(sentBy);
         document.setStatus(DocumentStatus.SENT);
@@ -212,13 +215,11 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
 
     @Override
     public List<UmbrellaAgreementResponse> getUserAgreements(String userEmail) {
-        // Get agreements where the user is the consultant (recipient) or the actor (sender)
-        List<ProcedureDocument> documents = documentRepository.findByActorEmailAndDocReferenceOrderByCreatedAtDesc(
-            userEmail, DocReference.UMBRELLA_AGREEMENT);
+        // Get all documents where the user is the consultant (recipient) or the actor (sender)
+        List<ProcedureDocument> documents = documentRepository.findByActorEmailOrderByCreatedAtDesc(userEmail);
         
-        // Also get agreements where the user is the consultant (recipient)
-        List<ProcedureDocument> receivedDocuments = documentRepository.findByProcedureConsultantEmailAndDocReferenceOrderByCreatedAtDesc(
-            userEmail, DocReference.UMBRELLA_AGREEMENT);
+        // Also get documents where the user is the consultant (recipient)
+        List<ProcedureDocument> receivedDocuments = documentRepository.findByProcedureConsultantEmailOrderByCreatedAtDesc(userEmail);
         
         // Combine both lists and remove duplicates
         Set<Long> seenIds = new HashSet<>();
@@ -256,8 +257,7 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
 
     @Override
     public List<UmbrellaAgreementResponse> getPendingReviewAgreements() {
-        List<ProcedureDocument> documents = documentRepository.findByDocReferenceAndStatusOrderByCreatedAtDesc(
-            DocReference.UMBRELLA_AGREEMENT, DocumentStatus.SIGNED);
+        List<ProcedureDocument> documents = documentRepository.findByStatusOrderByCreatedAtDesc(DocumentStatus.SIGNED);
 
         return documents.stream()
             .map(this::createUmbrellaAgreementResponseFromDocument)
@@ -317,7 +317,8 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
             document.getStatus() == DocumentStatus.APPROVED ? document.getCreatedAt().toString() : null,
             extractGoogleDriveUrl(document.getNotes()),
             document.getLocation(),
-            documentName
+            documentName,
+            document.getDocReference().name()
         );
     }
 
@@ -340,5 +341,18 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
             return notes.split("URL:")[1].trim();
         }
         return null;
+    }
+
+    private DocReference determineDocReference(String documentType) {
+        if (documentType == null) {
+            return DocReference.UMBRELLA_AGREEMENT; // Default
+        }
+        
+        try {
+            return DocReference.valueOf(documentType);
+        } catch (IllegalArgumentException e) {
+            // If the document type is not a valid enum value, default to UMBRELLA_AGREEMENT
+            return DocReference.UMBRELLA_AGREEMENT;
+        }
     }
 }

@@ -1,0 +1,451 @@
+/* Zforms Color Variables */
+:root {
+  --zforms-bg: #0f172a;
+  --zforms-surface: #1e293b;
+  --zforms-border: #334155;
+  --zforms-accent: #38bdf8;
+  --zforms-accent-hover: #0ea5e9;
+  --zforms-text: #f1f5f9;
+  --zforms-muted: #94a3b8;
+  --zforms-success: #10b981;
+  --zforms-warning: #f59e0b;
+  --zforms-error: #ef4444;
+  --zforms-radius: 12px;
+  --zforms-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* Container */
+.container {
+  background: var(--zforms-surface);
+  border-radius: var(--zforms-radius);
+  border: 1px solid var(--zforms-border);
+  overflow: hidden;
+}
+
+/* Search */
+.searchContainer {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--zforms-border);
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--zforms-bg);
+  border: 1px solid var(--zforms-border);
+  border-radius: var(--zforms-radius);
+  color: var(--zforms-text);
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--zforms-accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+}
+
+.searchInput::placeholder {
+  color: var(--zforms-muted);
+}
+
+/* Empty State */
+.emptyState {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--zforms-muted);
+}
+
+.emptyIcon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  color: var(--zforms-muted);
+}
+
+.emptyText {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Users List */
+.usersList {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.userRow {
+  border-bottom: 1px solid var(--zforms-border);
+}
+
+.userRow:last-child {
+  border-bottom: none;
+}
+
+/* User Toggle Button */
+.userToggle {
+  width: 100%;
+  padding: 1.5rem;
+  background: none;
+  border: none;
+  color: var(--zforms-text);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.userToggle:hover {
+  background: var(--zforms-bg);
+}
+
+.userToggle:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--zforms-accent);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.userName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--zforms-text);
+}
+
+.userEmail {
+  font-size: 0.875rem;
+  color: var(--zforms-muted);
+}
+
+.userMeta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.docCount {
+  font-size: 0.875rem;
+  color: var(--zforms-muted);
+  background: var(--zforms-bg);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--zforms-border);
+}
+
+.expandIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: transform 0.2s ease;
+  color: var(--zforms-muted);
+}
+
+.expandIcon.expanded {
+  transform: rotate(180deg);
+}
+
+/* Documents Region */
+.documentsRegion {
+  background: var(--zforms-bg);
+  border-top: 1px solid var(--zforms-border);
+  padding: 1.5rem;
+}
+
+.noDocsMessage {
+  text-align: center;
+  color: var(--zforms-muted);
+  font-size: 0.875rem;
+  padding: 2rem;
+}
+
+/* Documents Table */
+.documentsTable {
+  border: 1px solid var(--zforms-border);
+  border-radius: var(--zforms-radius);
+  overflow: hidden;
+}
+
+.documentsHeader {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--zforms-surface);
+  border-bottom: 1px solid var(--zforms-border);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--zforms-text);
+}
+
+.docHeaderCell {
+  color: var(--zforms-muted);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.documentRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--zforms-border);
+  transition: background-color 0.2s ease;
+}
+
+.documentRow:hover {
+  background: var(--zforms-surface);
+}
+
+.documentRow:last-child {
+  border-bottom: none;
+}
+
+.docCell {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--zforms-text);
+}
+
+.docTitle {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.docType {
+  color: var(--zforms-muted);
+}
+
+.docDate {
+  color: var(--zforms-muted);
+  font-size: 0.75rem;
+}
+
+/* Status Badges */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statusSigned {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--zforms-success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.statusReceived {
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--zforms-accent);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.statusPending {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--zforms-warning);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.statusRejected {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--zforms-error);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Document Actions */
+.docActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--zforms-surface);
+  border: 1px solid var(--zforms-border);
+  border-radius: var(--zforms-radius);
+  color: var(--zforms-text);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+  background: var(--zforms-accent);
+  color: var(--zforms-bg);
+  border-color: var(--zforms-accent);
+}
+
+.actionButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--zforms-accent);
+}
+
+.actionIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--zforms-border);
+}
+
+.paginationButton {
+  padding: 0.5rem 1rem;
+  background: var(--zforms-surface);
+  border: 1px solid var(--zforms-border);
+  border-radius: var(--zforms-radius);
+  color: var(--zforms-text);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paginationButton:hover:not(:disabled) {
+  background: var(--zforms-accent);
+  color: var(--zforms-bg);
+  border-color: var(--zforms-accent);
+}
+
+.paginationButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.paginationButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--zforms-accent);
+}
+
+.pageNumbers {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.pageButton {
+  padding: 0.5rem 0.75rem;
+  background: var(--zforms-surface);
+  border: 1px solid var(--zforms-border);
+  border-radius: var(--zforms-radius);
+  color: var(--zforms-text);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 2.5rem;
+}
+
+.pageButton:hover {
+  background: var(--zforms-accent);
+  color: var(--zforms-bg);
+  border-color: var(--zforms-accent);
+}
+
+.pageButton.currentPage {
+  background: var(--zforms-accent);
+  color: var(--zforms-bg);
+  border-color: var(--zforms-accent);
+}
+
+.pageButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--zforms-accent);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .documentsHeader,
+  .documentRow {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+  }
+  
+  .docHeaderCell:last-child,
+  .docCell:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .documentsHeader,
+  .documentRow {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .docHeaderCell:not(:first-child),
+  .docCell:not(:first-child) {
+    display: none;
+  }
+  
+  .userToggle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .userMeta {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .pagination {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .pageNumbers {
+    order: -1;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .expandIcon,
+  .actionButton,
+  .paginationButton,
+  .pageButton {
+    transition: none;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --zforms-bg: #f8fafc;
+    --zforms-surface: #ffffff;
+    --zforms-border: #e2e8f0;
+    --zforms-text: #1e293b;
+    --zforms-muted: #64748b;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .statusBadge {
+    border-width: 2px;
+  }
+  
+  .actionButton,
+  .paginationButton,
+  .pageButton {
+    border-width: 2px;
+  }
+}

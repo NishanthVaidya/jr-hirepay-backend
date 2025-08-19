@@ -3,6 +3,7 @@ import api from './api';
 export interface FrontOfficeUser {
   id: string;
   email: string;
+  fullName: string;
   designation: string;
   createdAt: string;
 }
@@ -21,12 +22,14 @@ export interface UmbrellaAgreement {
   googleDriveUrl?: string;
   documentUrl?: string;
   documentName?: string;
+  documentType?: string;
 }
 
 export interface SendUmbrellaAgreementRequest {
   frontOfficeUserId: string;
   notes?: string;
   document?: File;
+  documentType?: string;
 }
 
 export interface SignAgreementRequest {
@@ -63,6 +66,9 @@ export const umbrellaAgreementService = {
     }
     if (request.document) {
       formData.append('document', request.document);
+    }
+    if (request.documentType) {
+      formData.append('documentType', request.documentType);
     }
 
     const response = await api.post('/api/umbrella-agreements/send', formData, {
