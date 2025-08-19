@@ -638,9 +638,8 @@ const DocumentManagement: React.FC = () => {
                   }
                 }}
                 onDownloadDocument={(doc, user) => {
-                  if (doc.downloadUrl) {
-                    window.open(doc.downloadUrl, '_blank');
-                  }
+                  // Use the same download function as front office
+                  handleDownloadDocument(doc.id, doc.title + '.pdf');
                 }}
               />
             </div>
