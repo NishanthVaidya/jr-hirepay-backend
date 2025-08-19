@@ -18,6 +18,7 @@ export type CreateUserRequest = {
 };
 
 export type User = {
+  id: number;
   email: string;
   designation: string;
   fullName: string;
@@ -62,6 +63,7 @@ const AuthService = {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       return {
+        id: parseInt(payload.userId) || 0,
         email: payload.sub,
         designation: payload.designation,
         fullName: payload.fullName || payload.sub, // fallback to email if fullName not present

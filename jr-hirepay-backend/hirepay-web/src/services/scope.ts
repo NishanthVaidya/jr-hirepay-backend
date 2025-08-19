@@ -4,7 +4,7 @@ export interface Scope {
   id: number;
   title: string;
   description: string;
-  status: 'DRAFT' | 'IN_PROGRESS' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED' | 'COMPLETED';
+  status: 'DRAFT' | 'IN_PROGRESS' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED' | 'CHANGES_REQUESTED' | 'COMPLETED';
   assignedTo: UserInfo;
   assignedBy: UserInfo;
   reviewedBy?: UserInfo;
@@ -57,6 +57,7 @@ export interface UpdateScopeRequest {
 
 export interface ReviewScopeRequest {
   approved: boolean;
+  requestChanges: boolean;
   reviewNotes?: string;
 }
 
@@ -76,6 +77,7 @@ export interface ScopeStats {
   underReviewScopes: number;
   approvedScopes: number;
   rejectedScopes: number;
+  changesRequestedScopes: number;
   completedScopes: number;
 }
 
@@ -133,6 +135,12 @@ export const scopeService = {
   // Front Office: Submit scope for review
   submitScopeForReview: async (scopeId: number): Promise<Scope> => {
     const response = await api.post(`/api/scopes/${scopeId}/submit`);
+    return response.data;
+  },
+
+  // Front Office: Start working on scope
+  startWorkOnScope: async (scopeId: number): Promise<Scope> => {
+    const response = await api.post(`/api/scopes/${scopeId}/start-work`);
     return response.data;
   }
 };

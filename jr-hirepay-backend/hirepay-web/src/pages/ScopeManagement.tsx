@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { scopeService, Scope, ScopeDashboardResponse, CreateScopeRequest, ReviewScopeRequest, UserInfo } from '../services/scope';
+import { scopeService, Scope, ScopeDashboardResponse, ReviewScopeRequest, UserInfo } from '../services/scope';
 import { umbrellaAgreementService, FrontOfficeUser } from '../services/umbrellaAgreement';
 
 const ScopeManagement: React.FC = () => {
@@ -9,41 +9,16 @@ const ScopeManagement: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [dashboardData, setDashboardData] = useState<ScopeDashboardResponse | null>(null);
   const [frontOfficeUsers, setFrontOfficeUsers] = useState<FrontOfficeUser[]>([]);
-  const [selectedScope, setSelectedScope] = useState<Scope | null>(null);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showReviewForm, setShowReviewForm] = useState(false);
-  const [reviewDecision, setReviewDecision] = useState<'approve' | 'reject'>('approve');
+  const [expandedScopeId, setExpandedScopeId] = useState<number | null>(null);
+  const [expandedReviewId, setExpandedReviewId] = useState<number | null>(null);
+  const [reviewDecision, setReviewDecision] = useState<'approve' | 'reject' | 'request_changes'>('approve');
   const [reviewNotes, setReviewNotes] = useState('');
-
-  // Create scope form state
-  const [createForm, setCreateForm] = useState<CreateScopeRequest>({
-    title: '',
-    description: '',
-    assignedToUserId: 0,
-    template: '',
-    objectives: '',
-    deliverables: '',
-    timeline: '',
-    requirements: '',
-    constraints: '',
-    dueDate: ''
-  });
 
   const isBackOffice = currentUser?.roles.includes('BACK_OFFICE') || currentUser?.roles.includes('ADMIN');
 
-  // Scope templates
-  const scopeTemplates = [
-    { value: 'Web Development', label: 'Web Development' },
-    { value: 'Mobile Development', label: 'Mobile Development' },
-    { value: 'Consulting', label: 'Consulting' },
-    { value: 'Design', label: 'Design' },
-    { value: 'Data Analysis', label: 'Data Analysis' },
-    { value: 'Custom', label: 'Custom' }
-  ];
-
   const loadData = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const [dashboard, users] = await Promise.all([
         scopeService.getBackOfficeDashboard(),
         umbrellaAgreementService.getFrontOfficeUsers()
@@ -65,58 +40,53 @@ const ScopeManagement: React.FC = () => {
     }
   }, [isBackOffice, loadData]);
 
-  const handleCreateScope = async () => {
-    if (!createForm.title || !createForm.description || !createForm.assignedToUserId) {
-      setError('Please fill in all required fields');
-      return;
-    }
+  const toggleScopeExpansion = (scopeId: number) => {
+    setExpandedScopeId(expandedScopeId === scopeId ? null : scopeId);
+  };
 
-    try {
-      await scopeService.createScope(createForm);
-      setShowCreateForm(false);
-      setCreateForm({
-        title: '',
-        description: '',
-        assignedToUserId: 0,
-        template: '',
-        objectives: '',
-        deliverables: '',
-        timeline: '',
-        requirements: '',
-        constraints: '',
-        dueDate: ''
-      });
-      loadData();
-      alert('Scope created successfully!');
-    } catch (err) {
-      setError('Failed to create scope');
-      console.error(err);
+  const toggleReviewSection = (scopeId: number) => {
+    if (expandedReviewId === scopeId) {
+      setExpandedReviewId(null);
+      setReviewNotes('');
+      setReviewDecision('approve');
+    } else {
+      setExpandedReviewId(scopeId);
+      setReviewNotes('');
+      setReviewDecision('approve');
     }
   };
 
-  const handleReviewScope = async () => {
-    if (!selectedScope) return;
-
+  const handleInlineReview = async (scope: Scope) => {
     try {
       const request: ReviewScopeRequest = {
         approved: reviewDecision === 'approve',
+        requestChanges: reviewDecision === 'request_changes',
         reviewNotes: reviewNotes || undefined
       };
 
-      await scopeService.reviewScope(selectedScope.id, request);
-      setShowReviewForm(false);
-      setReviewDecision('approve');
+      await scopeService.reviewScope(scope.id, request);
+      
+      setExpandedReviewId(null);
       setReviewNotes('');
-      setSelectedScope(null);
-      loadData();
-      alert(`Scope ${reviewDecision === 'approve' ? 'approved' : 'rejected'} successfully!`);
+      setReviewDecision('approve');
+      
+      await loadData();
+      
+      let message = '';
+      if (reviewDecision === 'approve') {
+        message = 'Scope approved successfully!';
+      } else if (reviewDecision === 'reject') {
+        message = 'Scope rejected successfully!';
+      } else {
+        message = 'Changes requested successfully! The scope has been sent back to the front office user for amendments.';
+      }
+      
+      alert(message);
     } catch (err) {
       setError('Failed to review scope');
       console.error(err);
     }
   };
-
-
 
   const getStatusBadge = (status: string) => {
     const statusClasses = {
@@ -125,6 +95,7 @@ const ScopeManagement: React.FC = () => {
       'UNDER_REVIEW': 'zforms__badge--review',
       'APPROVED': 'zforms__badge--approved',
       'REJECTED': 'zforms__badge--rejected',
+      'CHANGES_REQUESTED': 'zforms__badge--warning',
       'COMPLETED': 'zforms__badge--completed'
     };
     
@@ -132,6 +103,74 @@ const ScopeManagement: React.FC = () => {
       <span className={`zforms__badge--status ${statusClasses[status as keyof typeof statusClasses] || 'zforms__badge--status'}`}>
         {status.replace('_', ' ')}
       </span>
+    );
+  };
+
+  const renderScopeDetails = (scope: Scope) => {
+    return (
+      <div className="bg-gray-50 p-4 rounded-lg mt-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-2">Project Information</h4>
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="font-medium">Template:</span> {scope.template || 'Not specified'}
+              </div>
+              <div>
+                <span className="font-medium">Timeline:</span> {scope.timeline || 'Not specified'}
+              </div>
+              <div>
+                <span className="font-medium">Due Date:</span> {scope.dueDate ? new Date(scope.dueDate).toLocaleDateString() : 'Not specified'}
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-2">Assignment Details</h4>
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="font-medium">Assigned By:</span> {scope.assignedBy.fullName} ({scope.assignedBy.email})
+              </div>
+              <div>
+                <span className="font-medium">Created:</span> {new Date(scope.createdAt).toLocaleDateString()}
+              </div>
+              <div>
+                <span className="font-medium">Last Updated:</span> {new Date(scope.updatedAt).toLocaleDateString()}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          {scope.objectives && (
+            <div>
+              <h4 className="font-semibold text-gray-700 mb-1">Objectives</h4>
+              <p className="text-sm text-gray-600 bg-white p-2 rounded border">{scope.objectives}</p>
+            </div>
+          )}
+          
+          {scope.deliverables && (
+            <div>
+              <h4 className="font-semibold text-gray-700 mb-1">Deliverables</h4>
+              <p className="text-sm text-gray-600 bg-white p-2 rounded border">{scope.deliverables}</p>
+            </div>
+          )}
+          
+          {scope.requirements && (
+            <div>
+              <h4 className="font-semibold text-gray-700 mb-1">Requirements</h4>
+              <p className="text-sm text-gray-600 bg-white p-2 rounded border">{scope.requirements}</p>
+            </div>
+          )}
+          
+          {scope.constraints && (
+            <div>
+              <h4 className="font-semibold text-gray-700 mb-1">Constraints</h4>
+              <p className="text-sm text-gray-600 bg-white p-2 rounded border">{scope.constraints}</p>
+            </div>
+          )}
+        </div>
+      </div>
     );
   };
 
@@ -176,7 +215,7 @@ const ScopeManagement: React.FC = () => {
           <div>
             <h1 className="zform-dashboard-title">Scope Management</h1>
             <p className="zform-dashboard-subtitle">
-              Welcome, {currentUser?.email} ({currentUser?.designation})
+              Welcome, {currentUser?.fullName} ({currentUser?.designation})
             </p>
           </div>
         </div>
@@ -187,198 +226,6 @@ const ScopeManagement: React.FC = () => {
             {error}
           </div>
         )}
-
-        {/* Stats Overview */}
-        {dashboardData && (
-          <div className="zforms mb-8">
-            <div className="zforms__section">
-              <div className="zforms__header">
-                <div className="zforms__title">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                  Scope Statistics
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 p-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{dashboardData.stats.totalScopes}</div>
-                  <div className="text-sm text-gray-600">Total</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-500">{dashboardData.stats.draftScopes}</div>
-                  <div className="text-sm text-gray-600">Draft</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-600">{dashboardData.stats.inProgressScopes}</div>
-                  <div className="text-sm text-gray-600">In Progress</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">{dashboardData.stats.underReviewScopes}</div>
-                  <div className="text-sm text-gray-600">Under Review</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{dashboardData.stats.approvedScopes}</div>
-                  <div className="text-sm text-gray-600">Approved</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600">{dashboardData.stats.rejectedScopes}</div>
-                  <div className="text-sm text-gray-600">Rejected</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">{dashboardData.stats.completedScopes}</div>
-                  <div className="text-sm text-gray-600">Completed</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Create New Scope Section */}
-        <div className="zforms mb-8">
-          <div className="zforms__section">
-            <div className="zforms__header">
-              <div className="zforms__title">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Create New Scope
-              </div>
-              <button
-                onClick={() => setShowCreateForm(!showCreateForm)}
-                className="zforms__button zforms__button--primary"
-              >
-                {showCreateForm ? 'Cancel' : 'Create Scope'}
-              </button>
-            </div>
-            
-            {showCreateForm && (
-              <div className="zforms__content">
-                <div className="zforms__form-grid">
-                  <div className="zforms__form-field">
-                    <label className="zforms__form-label">Project Title *</label>
-                    <input
-                      type="text"
-                      value={createForm.title}
-                      onChange={(e) => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
-                      className="zforms__form-input"
-                      placeholder="Enter project title"
-                    />
-                  </div>
-
-                  <div className="zforms__form-field">
-                    <label className="zforms__form-label">Assign To *</label>
-                    <select
-                      value={createForm.assignedToUserId}
-                      onChange={(e) => setCreateForm(prev => ({ ...prev, assignedToUserId: Number(e.target.value) }))}
-                      className="zforms__form-input"
-                    >
-                      <option value={0}>Choose a user...</option>
-                      {frontOfficeUsers.map((user) => (
-                        <option key={user.id} value={user.id}>
-                          {user.designation} - {user.email}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="zforms__form-field">
-                  <label className="zforms__form-label">Project Description *</label>
-                  <textarea
-                    value={createForm.description}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, description: e.target.value }))}
-                    className="zforms__form-textarea"
-                    rows={3}
-                    placeholder="Describe the project objectives and goals..."
-                  />
-                </div>
-
-                <div className="zforms__form-grid">
-                  <div className="zforms__form-field">
-                    <label className="zforms__form-label">Template</label>
-                    <select
-                      value={createForm.template}
-                      onChange={(e) => setCreateForm(prev => ({ ...prev, template: e.target.value }))}
-                      className="zforms__form-input"
-                    >
-                      <option value="">Choose a template...</option>
-                      {scopeTemplates.map((template) => (
-                        <option key={template.value} value={template.value}>
-                          {template.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="zforms__form-field">
-                    <label className="zforms__form-label">Timeline</label>
-                    <input
-                      type="text"
-                      value={createForm.timeline}
-                      onChange={(e) => setCreateForm(prev => ({ ...prev, timeline: e.target.value }))}
-                      className="zforms__form-input"
-                      placeholder="e.g., 3 months, 6 weeks"
-                    />
-                  </div>
-                </div>
-
-                <div className="zforms__form-field">
-                  <label className="zforms__form-label">Objectives</label>
-                  <textarea
-                    value={createForm.objectives}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, objectives: e.target.value }))}
-                    className="zforms__form-textarea"
-                    rows={2}
-                    placeholder="Project objectives and goals..."
-                  />
-                </div>
-
-                <div className="zforms__form-field">
-                  <label className="zforms__form-label">Deliverables</label>
-                  <textarea
-                    value={createForm.deliverables}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, deliverables: e.target.value }))}
-                    className="zforms__form-textarea"
-                    rows={2}
-                    placeholder="List the specific deliverables..."
-                  />
-                </div>
-
-                <div className="zforms__form-field">
-                  <label className="zforms__form-label">Due Date</label>
-                  <input
-                    type="date"
-                    value={createForm.dueDate}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, dueDate: e.target.value }))}
-                    className="zforms__form-input"
-                  />
-                </div>
-
-                <div className="zforms__form-field">
-                  <label className="zforms__form-label">Requirements</label>
-                  <textarea
-                    value={createForm.requirements}
-                    onChange={(e) => setCreateForm(prev => ({ ...prev, requirements: e.target.value }))}
-                    className="zforms__form-textarea"
-                    rows={2}
-                    placeholder="Special requirements or constraints..."
-                  />
-                </div>
-
-                <div className="zforms__form-actions">
-                  <button
-                    onClick={handleCreateScope}
-                    className="zforms__button zforms__button--primary"
-                  >
-                    Create Scope
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Pending Reviews Section */}
         {dashboardData && dashboardData.pendingReviews.length > 0 && (
@@ -405,33 +252,162 @@ const ScopeManagement: React.FC = () => {
                   <div className="zforms__cell">Actions</div>
                 </div>
                 {dashboardData.pendingReviews.map((scope, index) => (
-                  <div key={scope.id} className={`z-row ${index % 2 === 0 ? 'z-row--even' : 'z-row--odd'}`}>
-                    <div className="zforms__cell" data-label="Title">
-                      <div className="font-medium">{scope.title}</div>
-                      <div className="text-sm text-gray-500">{scope.description}</div>
+                  <div key={scope.id}>
+                    <div className={`z-row ${index % 2 === 0 ? 'z-row--even' : 'z-row--odd'}`}>
+                      <div className="zforms__cell" data-label="Title">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium">{scope.title}</div>
+                            <div className="text-sm text-gray-500">{scope.description}</div>
+                          </div>
+                          <button
+                            onClick={() => toggleScopeExpansion(scope.id)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            {expandedScopeId === scope.id ? '▼' : '▶'}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="zforms__cell" data-label="Assigned To">
+                        <div className="font-medium">{scope.assignedTo.fullName}</div>
+                        <div className="text-sm text-gray-500">{scope.assignedTo.email}</div>
+                      </div>
+                      <div className="zforms__cell" data-label="Status">
+                        {getStatusBadge(scope.status)}
+                      </div>
+                      <div className="zforms__cell" data-label="Created">
+                        {new Date(scope.createdAt).toLocaleDateString()}
+                      </div>
+                      <div className="zforms__cell" data-label="Actions">
+                        <button
+                          onClick={() => toggleReviewSection(scope.id)}
+                          className="zforms__button zforms__button--primary mr-2"
+                        >
+                          {expandedReviewId === scope.id ? 'Hide Review' : 'Review'}
+                        </button>
+                      </div>
                     </div>
-                    <div className="zforms__cell" data-label="Assigned To">
-                      <div className="font-medium">{scope.assignedTo.fullName}</div>
-                      <div className="text-sm text-gray-500">{scope.assignedTo.email}</div>
-                    </div>
-                    <div className="zforms__cell" data-label="Status">
-                      {getStatusBadge(scope.status)}
-                    </div>
-                    <div className="zforms__cell" data-label="Created">
-                      {new Date(scope.createdAt).toLocaleDateString()}
-                    </div>
-                    <div className="zforms__cell" data-label="Actions">
-                      <button
-                        onClick={() => {
-                          setSelectedScope(scope);
-                          setShowReviewForm(true);
-                        }}
-                        className="zforms__button zforms__button--primary mr-2"
-                      >
-                        Review
-                      </button>
-                      
-                    </div>
+                    {expandedScopeId === scope.id && renderScopeDetails(scope)}
+                    
+                    {/* Collapsible Review Section */}
+                    {expandedReviewId === scope.id && (
+                      <div className="z-row z-row--review-expanded">
+                        <div className="zforms__cell zforms__review-section" style={{ gridColumn: '1 / -1' }}>
+                          <div className="zforms__review-content">
+                            <h4 className="zforms__review-title">Review Scope</h4>
+                            
+                            <div className="zforms__review-info">
+                              <div className="zforms__review-info-item">
+                                <strong>Assigned to:</strong> {scope.assignedTo.fullName} ({scope.assignedTo.email})
+                              </div>
+                              <div className="zforms__review-info-item">
+                                <strong>Created:</strong> {new Date(scope.createdAt).toLocaleDateString()}
+                              </div>
+                              <div className="zforms__review-info-item">
+                                <strong>Template:</strong> {scope.template || 'Not specified'}
+                              </div>
+                              <div className="zforms__review-info-item">
+                                <strong>Timeline:</strong> {scope.timeline || 'Not specified'}
+                              </div>
+                              {scope.objectives && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Objectives:</strong> {scope.objectives}
+                                </div>
+                              )}
+                              {scope.deliverables && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Deliverables:</strong> {scope.deliverables}
+                                </div>
+                              )}
+                              {scope.requirements && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Requirements:</strong> {scope.requirements}
+                                </div>
+                              )}
+                              {scope.constraints && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Constraints:</strong> {scope.constraints}
+                                </div>
+                              )}
+                            </div>
+                            
+                            <form onSubmit={(e) => {
+                              e.preventDefault();
+                              handleInlineReview(scope);
+                            }} className="zforms__review-form">
+                              <div className="zforms__review-decision">
+                                <label className="zforms__review-label">Review Decision</label>
+                                <div className="zforms__review-radio-group">
+                                  <label className="zforms__review-radio">
+                                    <input
+                                      type="radio"
+                                      value="approve"
+                                      checked={reviewDecision === 'approve'}
+                                      onChange={() => setReviewDecision('approve')}
+                                      className="zforms__radio-input"
+                                    />
+                                    <span className="zforms__radio-label">Approve</span>
+                                  </label>
+                                  <label className="zforms__review-radio">
+                                    <input
+                                      type="radio"
+                                      value="reject"
+                                      checked={reviewDecision === 'reject'}
+                                      onChange={() => setReviewDecision('reject')}
+                                      className="zforms__radio-input"
+                                    />
+                                    <span className="zforms__radio-label">Reject</span>
+                                  </label>
+                                  <label className="zforms__review-radio">
+                                    <input
+                                      type="radio"
+                                      value="request_changes"
+                                      checked={reviewDecision === 'request_changes'}
+                                      onChange={() => setReviewDecision('request_changes')}
+                                      className="zforms__radio-input"
+                                    />
+                                    <span className="zforms__radio-label">Request Changes</span>
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div className="zforms__review-notes">
+                                <label className="zforms__review-label">Review Notes (Optional)</label>
+                                <textarea
+                                  value={reviewNotes}
+                                  onChange={(e) => setReviewNotes(e.target.value)}
+                                  rows={3}
+                                  className="zforms__review-textarea"
+                                  placeholder="Add review comments..."
+                                />
+                              </div>
+
+                              <div className="zforms__review-actions">
+                                <button
+                                  type="button"
+                                  onClick={() => toggleReviewSection(scope.id)}
+                                  className="zforms__button zforms__button--secondary"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="submit"
+                                  className={`zforms__button ${
+                                    reviewDecision === 'approve' 
+                                      ? 'zforms__button--success' 
+                                      : reviewDecision === 'reject'
+                                        ? 'zforms__button--danger'
+                                        : 'zforms__button--warning'
+                                  }`}
+                                >
+                                  {reviewDecision === 'approve' ? 'Approve' : reviewDecision === 'reject' ? 'Reject' : 'Request Changes'} Scope
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -464,110 +440,173 @@ const ScopeManagement: React.FC = () => {
                   <div className="zforms__cell">Actions</div>
                 </div>
                 {dashboardData.allScopes.map((scope, index) => (
-                  <div key={scope.id} className={`z-row ${index % 2 === 0 ? 'z-row--even' : 'z-row--odd'}`}>
-                    <div className="zforms__cell" data-label="Title">
-                      <div className="font-medium">{scope.title}</div>
-                      <div className="text-sm text-gray-500">{scope.description}</div>
+                  <div key={scope.id}>
+                    <div className={`z-row ${index % 2 === 0 ? 'z-row--even' : 'z-row--odd'}`}>
+                      <div className="zforms__cell" data-label="Title">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium">{scope.title}</div>
+                            <div className="text-sm text-gray-500">{scope.description}</div>
+                          </div>
+                          <button
+                            onClick={() => toggleScopeExpansion(scope.id)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            {expandedScopeId === scope.id ? '▼' : '▶'}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="zforms__cell" data-label="Assigned To">
+                        <div className="font-medium">{scope.assignedTo.fullName}</div>
+                        <div className="text-sm text-gray-500">{scope.assignedTo.email}</div>
+                      </div>
+                      <div className="zforms__cell" data-label="Status">
+                        {getStatusBadge(scope.status)}
+                      </div>
+                      <div className="zforms__cell" data-label="Created">
+                        {new Date(scope.createdAt).toLocaleDateString()}
+                      </div>
+                      <div className="zforms__cell" data-label="Actions">
+                        {(scope.status === 'UNDER_REVIEW' || scope.status === 'CHANGES_REQUESTED') && (
+                          <button
+                            onClick={() => toggleReviewSection(scope.id)}
+                            className="zforms__button zforms__button--primary"
+                          >
+                            {expandedReviewId === scope.id ? 'Hide Review' : 'Review'}
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <div className="zforms__cell" data-label="Assigned To">
-                      <div className="font-medium">{scope.assignedTo.fullName}</div>
-                      <div className="text-sm text-gray-500">{scope.assignedTo.email}</div>
-                    </div>
-                    <div className="zforms__cell" data-label="Status">
-                      {getStatusBadge(scope.status)}
-                    </div>
-                    <div className="zforms__cell" data-label="Created">
-                      {new Date(scope.createdAt).toLocaleDateString()}
-                    </div>
-                                               <div className="zforms__cell" data-label="Actions">
-                             {scope.status === 'UNDER_REVIEW' && (
-                               <button
-                                 onClick={() => {
-                                   setSelectedScope(scope);
-                                   setShowReviewForm(true);
-                                 }}
-                                 className="zforms__button zforms__button--primary"
-                               >
-                                 Review
-                               </button>
-                             )}
-                           </div>
+                    {expandedScopeId === scope.id && renderScopeDetails(scope)}
+                    
+                    {/* Collapsible Review Section for All Scopes */}
+                    {expandedReviewId === scope.id && (scope.status === 'UNDER_REVIEW' || scope.status === 'CHANGES_REQUESTED') && (
+                      <div className="z-row z-row--review-expanded">
+                        <div className="zforms__cell zforms__review-section" style={{ gridColumn: '1 / -1' }}>
+                          <div className="zforms__review-content">
+                            <h4 className="zforms__review-title">Review Scope</h4>
+                            
+                            <div className="zforms__review-info">
+                              <div className="zforms__review-info-item">
+                                <strong>Assigned to:</strong> {scope.assignedTo.fullName} ({scope.assignedTo.email})
+                              </div>
+                              <div className="zforms__review-info-item">
+                                <strong>Created:</strong> {new Date(scope.createdAt).toLocaleDateString()}
+                              </div>
+                              <div className="zforms__review-info-item">
+                                <strong>Template:</strong> {scope.template || 'Not specified'}
+                              </div>
+                              <div className="zforms__review-info-item">
+                                <strong>Timeline:</strong> {scope.timeline || 'Not specified'}
+                              </div>
+                              {scope.objectives && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Objectives:</strong> {scope.objectives}
+                                </div>
+                              )}
+                              {scope.deliverables && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Deliverables:</strong> {scope.deliverables}
+                                </div>
+                              )}
+                              {scope.requirements && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Requirements:</strong> {scope.requirements}
+                                </div>
+                              )}
+                              {scope.constraints && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Constraints:</strong> {scope.constraints}
+                                </div>
+                              )}
+                            </div>
+                            
+                            <form onSubmit={(e) => {
+                              e.preventDefault();
+                              handleInlineReview(scope);
+                            }} className="zforms__review-form">
+                              <div className="zforms__review-decision">
+                                <label className="zforms__review-label">Review Decision</label>
+                                <div className="zforms__review-radio-group">
+                                  <label className="zforms__review-radio">
+                                    <input
+                                      type="radio"
+                                      value="approve"
+                                      checked={reviewDecision === 'approve'}
+                                      onChange={() => setReviewDecision('approve')}
+                                      className="zforms__radio-input"
+                                    />
+                                    <span className="zforms__radio-label">Approve</span>
+                                  </label>
+                                  <label className="zforms__review-radio">
+                                    <input
+                                      type="radio"
+                                      value="reject"
+                                      checked={reviewDecision === 'reject'}
+                                      onChange={() => setReviewDecision('reject')}
+                                      className="zforms__radio-input"
+                                    />
+                                    <span className="zforms__radio-label">Reject</span>
+                                  </label>
+                                  <label className="zforms__review-radio">
+                                    <input
+                                      type="radio"
+                                      value="request_changes"
+                                      checked={reviewDecision === 'request_changes'}
+                                      onChange={() => setReviewDecision('request_changes')}
+                                      className="zforms__radio-input"
+                                    />
+                                    <span className="zforms__radio-label">Request Changes</span>
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div className="zforms__review-notes">
+                                <label className="zforms__review-label">Review Notes (Optional)</label>
+                                <textarea
+                                  value={reviewNotes}
+                                  onChange={(e) => setReviewNotes(e.target.value)}
+                                  rows={3}
+                                  className="zforms__review-textarea"
+                                  placeholder="Add review comments..."
+                                />
+                              </div>
+
+                              <div className="zforms__review-actions">
+                                <button
+                                  type="button"
+                                  onClick={() => toggleReviewSection(scope.id)}
+                                  className="zforms__button zforms__button--secondary"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="submit"
+                                  className={`zforms__button ${
+                                    reviewDecision === 'approve' 
+                                      ? 'zforms__button--success' 
+                                      : reviewDecision === 'reject'
+                                        ? 'zforms__button--danger'
+                                        : 'zforms__button--warning'
+                                  }`}
+                                >
+                                  {reviewDecision === 'approve' ? 'Approve' : reviewDecision === 'reject' ? 'Reject' : 'Request Changes'} Scope
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
           </div>
         )}
-
-        {/* Review Modal */}
-        {showReviewForm && selectedScope && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <h3 className="text-lg font-semibold mb-4">Review Scope</h3>
-              <p className="text-sm text-gray-600 mb-4">{selectedScope.title}</p>
-              
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-2">Review Decision</label>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="approve"
-                      checked={reviewDecision === 'approve'}
-                      onChange={(e) => setReviewDecision(e.target.value as 'approve' | 'reject')}
-                      className="mr-2"
-                    />
-                    Approve
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="reject"
-                      checked={reviewDecision === 'reject'}
-                      onChange={(e) => setReviewDecision(e.target.value as 'approve' | 'reject')}
-                      className="mr-2"
-                    />
-                    Reject
-                  </label>
-                </div>
-              </div>
-              
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-2">Review Notes</label>
-                <textarea
-                  value={reviewNotes}
-                  onChange={(e) => setReviewNotes(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded"
-                  rows={3}
-                  placeholder="Add review comments..."
-                />
-              </div>
-              
-              <div className="flex justify-end space-x-2">
-                <button
-                  onClick={() => setShowReviewForm(false)}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleReviewScope}
-                  className={`px-4 py-2 text-white rounded ${
-                    reviewDecision === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
-                  }`}
-                >
-                  {reviewDecision === 'approve' ? 'Approve' : 'Reject'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        
       </div>
     </div>
   );
 };
 
 export default ScopeManagement;
-

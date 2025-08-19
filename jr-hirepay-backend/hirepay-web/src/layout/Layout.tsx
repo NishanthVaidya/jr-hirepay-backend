@@ -23,11 +23,11 @@ const Layout: React.FC = () => {
           <div className="zforms__nav-content">
             {/* Logo */}
             <div className="zforms__nav-logo">
-              <Link to="/dashboard/home" className="zforms__nav-logo-link">
-                <div className="zforms__nav-logo-icon">
-                  <span className="zforms__nav-logo-text">H</span>
+              <Link to="/dashboard/home" className="zforms__nav-logo-link" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="zforms__nav-logo-icon" style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #38bdf8, #0ea5e9)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className="zforms__nav-logo-text" style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '16px' }}>H</span>
                 </div>
-                <span className="zforms__nav-logo-title">HirePay</span>
+                <span className="zforms__nav-logo-title" style={{ fontSize: '20px', fontWeight: 'bold', color: '#f1f5f9' }}>HirePay</span>
               </Link>
             </div>
             
@@ -41,14 +41,20 @@ const Layout: React.FC = () => {
                   {(currentUser.roles.includes("BACK_OFFICE") || currentUser.roles.includes("ADMIN")) && (
                     <Link to="/dashboard/documents" className="zforms__nav-link">Documents</Link>
                   )}
+                  {(currentUser.roles.includes("FRONT_OFFICE")) && (
+                    <Link to="/dashboard/documents" className="zforms__nav-link">My Documents</Link>
+                  )}
                   {(currentUser.roles.includes("BACK_OFFICE") || currentUser.roles.includes("ADMIN")) && (
                     <Link to="/dashboard/scope-management" className="zforms__nav-link">Scope Management</Link>
                   )}
-                  {(currentUser.roles.includes("BACK_OFFICE") || currentUser.roles.includes("ADMIN") || currentUser.roles.includes("FRONT_OFFICE")) && (
+                  {(currentUser.roles.includes("BACK_OFFICE") || currentUser.roles.includes("ADMIN")) && (
                     <Link to="/dashboard/scope" className="zforms__nav-link">Scope Creation</Link>
                   )}
+                  {(currentUser.roles.includes("FRONT_OFFICE")) && (
+                    <Link to="/dashboard/my-scopes" className="zforms__nav-link">My Scopes</Link>
+                  )}
                   <span className="zforms__nav-user">
-                    {currentUser.email} ({currentUser.designation})
+                    {currentUser.fullName} ({currentUser.designation})
                   </span>
                   <button
                     onClick={handleLogout}

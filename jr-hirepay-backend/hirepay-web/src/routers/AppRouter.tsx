@@ -8,6 +8,7 @@ import Admin from '../pages/Admin';
 import DocumentManagement from '../pages/UmbrellaAgreementManagement';
 import ScopeCreation from '../pages/ScopeCreation';
 import ScopeManagement from '../pages/ScopeManagement';
+import MyScopes from '../pages/MyScopes';
 import { useAuth } from '../contexts/AuthContext';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -38,6 +39,7 @@ const AppRouter: React.FC = () => {
           <Route path="documents" element={<DocumentManagement />} />
           <Route path="scope" element={<ScopeCreation />} />
           <Route path="scope-management" element={<ScopeManagement />} />
+          <Route path="my-scopes" element={<MyScopes />} />
         </Route>
       </Routes>
     </Router>

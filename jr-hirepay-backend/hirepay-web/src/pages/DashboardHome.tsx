@@ -8,18 +8,14 @@ export default function DashboardHome() {
   return (
     <div className="zforms">
       <div className="zforms__section">
-        {/* Header */}
-        <div className="zforms__header">
-          <div className="zforms__header-content">
-            <div>
-              <h1 className="zforms__title">Get Hired</h1>
-              <p className="zforms__subtitle">Welcome to your hiring dashboard</p>
-            </div>
-            <div className="zforms__icon">
-              <svg className="zforms__icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6" />
-              </svg>
-            </div>
+
+
+        {/* Welcome Message */}
+        <div className="zforms__content">
+          <div className="zforms__welcome">
+            <h2 className="zforms__welcome-title" style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '2rem' }}>
+              Welcome, {currentUser?.fullName}!
+            </h2>
           </div>
         </div>
 
@@ -98,21 +94,35 @@ export default function DashboardHome() {
                 </Link>
               </div>
             )}
+
+            {/* My Scopes Card - For Front Office Users */}
+            {currentUser?.roles.includes("FRONT_OFFICE") && (
+              <div className="zforms__card">
+                <div className="zforms__card-icon zforms__card-icon--primary">
+                  <svg className="zforms__card-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <h3 className="zforms__card-title">My Scopes</h3>
+                <p className="zforms__card-description">
+                  View and manage your assigned scopes, track progress, and submit work for review.
+                </p>
+                <Link
+                  to="/dashboard/my-scopes"
+                  className="zforms__card-link"
+                >
+                  View My Scopes
+                  <svg className="zforms__card-link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            )}
+
           </div>
         </div>
 
-        {/* Welcome Message */}
-        <div className="zforms__section">
-          <div className="zforms__welcome">
-            <h2 className="zforms__welcome-title">Welcome, {currentUser?.designation}!</h2>
-            <p className="zforms__welcome-text">
-              You're logged in as <span className="zforms__welcome-highlight">{currentUser?.email}</span> with the following roles: 
-              <span className="zforms__welcome-highlight">
-                {currentUser?.roles.join(', ')}
-              </span>
-            </p>
-          </div>
-        </div>
+
       </div>
     </div>
   );
