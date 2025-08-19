@@ -190,6 +190,8 @@ const DocumentManagement: React.FC = () => {
     }
   };
 
+
+
   const getStatusBadge = (status: string, documentType?: string) => {
     // For front office users, show "RECEIVED" instead of "SENT"
     let displayStatus = (!isBackOffice && status === 'SENT') ? 'RECEIVED' : status;
@@ -501,6 +503,13 @@ const DocumentManagement: React.FC = () => {
                           className="zforms__button zforms__button--primary"
                         >
                           {expandedReviewId === document.documentId ? 'Hide Review' : 'Review'}
+                        </button>
+                        <button
+                          onClick={() => handleSaveToGoogleDrive(document.documentId, document.documentName || 'document.pdf')}
+                          className="zforms__button zforms__button--secondary"
+                          title="Save to Google Drive"
+                        >
+                          Save to Drive
                         </button>
                         {document.notes && (
                           <div className="zforms__comment" title={document.notes}>

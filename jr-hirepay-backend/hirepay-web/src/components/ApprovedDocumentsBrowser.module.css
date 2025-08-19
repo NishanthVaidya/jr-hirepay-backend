@@ -220,6 +220,27 @@
   white-space: nowrap;
 }
 
+.docTitleButton {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-weight: 500;
+  color: var(--zforms-accent);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.docTitleButton:hover {
+  color: var(--zforms-accent-hover);
+  text-decoration: underline;
+}
+
 .docType {
   color: var(--zforms-muted);
 }

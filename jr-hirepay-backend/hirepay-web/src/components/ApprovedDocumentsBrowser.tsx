@@ -88,6 +88,14 @@ const ApprovedDocumentsBrowser: React.FC<ApprovedDocumentsBrowserProps> = ({
     }
   };
 
+  const handleSaveToGoogleDrive = (doc: DocumentItem, user: UserItem) => {
+    // Dummy URL for now - will be connected to Google Drive later
+    const dummyGoogleDriveUrl = `https://drive.google.com/drive/folders/dummy-folder-id?usp=sharing`;
+    console.log(`Saving document "${doc.title}" to Google Drive for user "${user.name}"`);
+    console.log(`Google Drive URL: ${dummyGoogleDriveUrl}`);
+    alert(`Document "${doc.title}" will be saved to Google Drive. (Dummy URL: ${dummyGoogleDriveUrl})`);
+  };
+
   const getStatusBadge = (status: DocStatus) => {
     const statusClass = status === 'SIGNED' ? styles.statusSigned : 
                        status === 'APPROVED' ? styles.statusSigned : // Use same style as SIGNED for APPROVED
@@ -184,7 +192,13 @@ const ApprovedDocumentsBrowser: React.FC<ApprovedDocumentsBrowserProps> = ({
                         {approvedDocs.map((doc) => (
                           <div key={doc.id} className={styles.documentRow}>
                             <div className={styles.docCell} title={doc.title}>
-                              <span className={styles.docTitle}>{doc.title}</span>
+                              <button
+                                onClick={() => handleDownloadDocument(doc, user)}
+                                className={styles.docTitleButton}
+                                title="Download document"
+                              >
+                                {doc.title}
+                              </button>
                             </div>
                             <div className={styles.docCell}>
                               <span className={styles.docType}>{doc.type}</span>
@@ -200,25 +214,14 @@ const ApprovedDocumentsBrowser: React.FC<ApprovedDocumentsBrowserProps> = ({
                             <div className={styles.docCell}>
                               <div className={styles.docActions}>
                                 <button
-                                  onClick={() => handleViewDocument(doc, user)}
+                                  onClick={() => handleSaveToGoogleDrive(doc, user)}
                                   className={styles.actionButton}
-                                  title="View document"
+                                  title="Save to Google Drive"
                                 >
                                   <svg className={styles.actionIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
                                   </svg>
-                                  View
-                                </button>
-                                <button
-                                  onClick={() => handleDownloadDocument(doc, user)}
-                                  className={styles.actionButton}
-                                  title="Download document"
-                                >
-                                  <svg className={styles.actionIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                  </svg>
-                                  Download
+                                  Save to Drive
                                 </button>
                                 {doc.notes && (
                                   <span className={styles.docNote} title={doc.notes}>
