@@ -41,6 +41,9 @@ const Layout: React.FC = () => {
                   {(currentUser.roles.includes("BACK_OFFICE") || currentUser.roles.includes("ADMIN")) && (
                     <Link to="/dashboard/documents" className="zforms__nav-link">Documents</Link>
                   )}
+                  {(currentUser.roles.includes("BACK_OFFICE") || currentUser.roles.includes("ADMIN") || currentUser.roles.includes("FRONT_OFFICE")) && (
+                    <Link to="/dashboard/scope" className="zforms__nav-link">Scope Creation</Link>
+                  )}
                   <span className="zforms__nav-user">
                     {currentUser.email} ({currentUser.designation})
                   </span>

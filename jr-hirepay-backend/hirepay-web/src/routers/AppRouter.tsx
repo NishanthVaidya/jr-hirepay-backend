@@ -6,6 +6,7 @@ import DashboardHome from '../pages/DashboardHome';
 import Login from '../pages/Login';
 import Admin from '../pages/Admin';
 import DocumentManagement from '../pages/UmbrellaAgreementManagement';
+import ScopeCreation from '../pages/ScopeCreation';
 import { useAuth } from '../contexts/AuthContext';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -34,6 +35,7 @@ const AppRouter: React.FC = () => {
           <Route path="home" element={<DashboardHome />} />
           <Route path="admin" element={<Admin />} />
           <Route path="documents" element={<DocumentManagement />} />
+          <Route path="scope" element={<ScopeCreation />} />
         </Route>
       </Routes>
     </Router>
