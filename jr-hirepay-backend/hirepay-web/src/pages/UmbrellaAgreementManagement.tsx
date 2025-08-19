@@ -639,7 +639,7 @@ const DocumentManagement: React.FC = () => {
                 }}
                 onDownloadDocument={(doc, user) => {
                   // Use the same download function as front office
-                  handleDownloadDocument(doc.id, doc.title + '.pdf');
+                  handleDownloadDocument(doc.id, doc.title);
                 }}
               />
             </div>
