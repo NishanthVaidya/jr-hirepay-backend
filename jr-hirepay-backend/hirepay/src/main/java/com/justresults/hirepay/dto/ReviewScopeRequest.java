@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 public class ReviewScopeRequest {
     private boolean approved;
+    private boolean requestChanges;
     private String reviewNotes;
 }
 

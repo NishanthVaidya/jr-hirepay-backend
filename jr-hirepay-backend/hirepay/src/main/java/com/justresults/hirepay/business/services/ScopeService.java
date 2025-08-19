@@ -33,6 +33,9 @@ public interface ScopeService {
     // Submit scope for review (front office)
     ScopeResponse submitScopeForReview(Long scopeId);
     
+    // Start working on scope (front office)
+    ScopeResponse startWorkOnScope(Long scopeId);
+    
 
 }
 

@@ -6,6 +6,7 @@ public enum ScopeStatus {
     UNDER_REVIEW,    // Front office has submitted for review
     APPROVED,        // Back office has approved the scope
     REJECTED,        // Back office has rejected the scope
+    CHANGES_REQUESTED, // Back office has requested changes
     COMPLETED        // Scope has been completed
 }
 

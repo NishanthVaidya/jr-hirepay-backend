@@ -83,7 +83,27 @@ public class ScopeServiceImpl implements ScopeService {
         User reviewer = userRepository.findById(reviewerId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        scope.setStatus(request.isApproved() ? ScopeStatus.APPROVED : ScopeStatus.REJECTED);
+        // Determine the new status based on the review decision
+        ScopeStatus newStatus;
+        System.out.println("=== REVIEW SCOPE DEBUG ===");
+        System.out.println("Request approved: " + request.isApproved());
+        System.out.println("Request requestChanges: " + request.isRequestChanges());
+        
+        if (request.isApproved()) {
+            newStatus = ScopeStatus.APPROVED;
+            System.out.println("Setting status to APPROVED");
+        } else if (request.isRequestChanges()) {
+            newStatus = ScopeStatus.CHANGES_REQUESTED;
+            System.out.println("Setting status to CHANGES_REQUESTED");
+        } else {
+            newStatus = ScopeStatus.REJECTED;
+            System.out.println("Setting status to REJECTED");
+        }
+
+        System.out.println("Final status: " + newStatus);
+        System.out.println("=== END DEBUG ===");
+
+        scope.setStatus(newStatus);
         scope.setReviewNotes(request.getReviewNotes());
         scope.setReviewedBy(reviewer);
         scope.setReviewedAt(java.time.OffsetDateTime.now());
@@ -142,6 +162,16 @@ public class ScopeServiceImpl implements ScopeService {
         return convertToScopeResponse(savedScope);
     }
 
+    @Override
+    public ScopeResponse startWorkOnScope(Long scopeId) {
+        Scope scope = scopeRepository.findById(scopeId)
+                .orElseThrow(() -> new NotFoundException("Scope not found"));
+
+        scope.setStatus(ScopeStatus.IN_PROGRESS);
+        Scope savedScope = scopeRepository.save(scope);
+        return convertToScopeResponse(savedScope);
+    }
+
 
 
     // Helper methods
@@ -184,6 +214,7 @@ public class ScopeServiceImpl implements ScopeService {
         long underReviewScopes = scopes.stream().filter(s -> s.getStatus() == ScopeStatus.UNDER_REVIEW).count();
         long approvedScopes = scopes.stream().filter(s -> s.getStatus() == ScopeStatus.APPROVED).count();
         long rejectedScopes = scopes.stream().filter(s -> s.getStatus() == ScopeStatus.REJECTED).count();
+        long changesRequestedScopes = scopes.stream().filter(s -> s.getStatus() == ScopeStatus.CHANGES_REQUESTED).count();
         long completedScopes = scopes.stream().filter(s -> s.getStatus() == ScopeStatus.COMPLETED).count();
 
         return ScopeStats.builder()
@@ -193,6 +224,7 @@ public class ScopeServiceImpl implements ScopeService {
                 .underReviewScopes(underReviewScopes)
                 .approvedScopes(approvedScopes)
                 .rejectedScopes(rejectedScopes)
+                .changesRequestedScopes(changesRequestedScopes)
                 .completedScopes(completedScopes)
                 .build();
     }

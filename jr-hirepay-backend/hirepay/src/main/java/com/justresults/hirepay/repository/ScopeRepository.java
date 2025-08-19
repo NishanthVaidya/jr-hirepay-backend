@@ -27,8 +27,8 @@ public interface ScopeRepository extends JpaRepository<Scope, Long> {
     // Find scopes assigned by a user with specific status
     List<Scope> findByAssignedByIdAndStatusOrderByCreatedAtDesc(Long userId, ScopeStatus status);
     
-    // Find scopes that need review (UNDER_REVIEW status)
-    @Query("SELECT s FROM Scope s WHERE s.status = 'UNDER_REVIEW' ORDER BY s.createdAt DESC")
+    // Find scopes that need review (UNDER_REVIEW or CHANGES_REQUESTED status)
+    @Query("SELECT s FROM Scope s WHERE s.status IN ('UNDER_REVIEW', 'CHANGES_REQUESTED') ORDER BY s.createdAt DESC")
     List<Scope> findScopesNeedingReview();
     
     // Find scopes assigned to front office users by back office

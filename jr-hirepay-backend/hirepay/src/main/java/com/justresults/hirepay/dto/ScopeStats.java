@@ -13,6 +13,7 @@ public class ScopeStats {
     private long underReviewScopes;
     private long approvedScopes;
     private long rejectedScopes;
+    private long changesRequestedScopes;
     private long completedScopes;
 }
 

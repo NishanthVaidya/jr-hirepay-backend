@@ -108,6 +108,13 @@ public class ScopeController {
         return ResponseEntity.ok(response);
     }
 
+    // Front Office: Start working on scope
+    @PostMapping("/{scopeId}/start-work")
+    public ResponseEntity<ScopeResponse> startWorkOnScope(@PathVariable Long scopeId) {
+        ScopeResponse response = scopeService.startWorkOnScope(scopeId);
+        return ResponseEntity.ok(response);
+    }
+
     // Helper method to extract user ID from JWT token
     private Long getUserIdFromToken(String authHeader) {
         String token = authHeader.replace("Bearer ", "");
