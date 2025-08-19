@@ -196,7 +196,7 @@ public class DocumentWorkflowServiceImpl implements DocumentWorkflowService {
             case TAX_FORM_W9:
             case TAX_FORM_W8BEN:
             case PAYMENT_AUTH_FORM:
-                if (procedure.getStatus() == ProcedureStatus.AGREEMENT_SIGNED) {
+                if (procedure.getStatus() == ProcedureStatus.AGREEMENT_SUBMITTED) {
                     procedure.setStatus(ProcedureStatus.PAYMENT_TAX_SUBMITTED);
                 }
                 break;

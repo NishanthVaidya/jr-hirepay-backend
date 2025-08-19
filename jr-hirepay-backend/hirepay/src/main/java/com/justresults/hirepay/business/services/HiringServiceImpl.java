@@ -70,15 +70,15 @@ public class HiringServiceImpl implements HiringService {
         if (!(p.getStatus() == ProcedureStatus.DRAFT || p.getStatus() == ProcedureStatus.AGREEMENT_SENT)) {
             throw new InvalidStateException("Agreement can only be signed from DRAFT or AGREEMENT_SENT.");
         }
-        p.setStatus(ProcedureStatus.AGREEMENT_SIGNED);
+        p.setStatus(ProcedureStatus.AGREEMENT_SUBMITTED);
         return procedureRepo.save(p);
     }
 
     @Override
     public Procedure markPaymentTaxSubmitted(String uuid) {
         Procedure p = getByUuid(uuid);
-        if (p.getStatus() != ProcedureStatus.AGREEMENT_SIGNED) {
-            throw new InvalidStateException("Payment/Tax submission requires AGREEMENT_SIGNED.");
+        if (p.getStatus() != ProcedureStatus.AGREEMENT_SUBMITTED) {
+            throw new InvalidStateException("Payment/Tax submission requires AGREEMENT_SUBMITTED.");
         }
         p.setStatus(ProcedureStatus.PAYMENT_TAX_SUBMITTED);
         return procedureRepo.save(p);
@@ -111,7 +111,7 @@ public class HiringServiceImpl implements HiringService {
         if (p.getStatus() != ProcedureStatus.TASK_ORDER_GENERATED) {
             throw new InvalidStateException("Signed TO requires TASK_ORDER_GENERATED.");
         }
-        p.setStatus(ProcedureStatus.TASK_ORDER_SIGNED);
+        p.setStatus(ProcedureStatus.TASK_ORDER_SUBMITTED);
         return procedureRepo.save(p);
     }
 
@@ -126,7 +126,7 @@ public class HiringServiceImpl implements HiringService {
         p.setTaskOrderAcceptedBy(acceptedBy);
         p.setTaskOrderAcceptedAt(Instant.now());
         p.setTaskOrderAcceptedFrom(acceptedFrom);
-        p.setStatus(ProcedureStatus.TASK_ORDER_SIGNED);
+        p.setStatus(ProcedureStatus.TASK_ORDER_SUBMITTED);
         
         return procedureRepo.save(p);
     }
@@ -134,8 +134,8 @@ public class HiringServiceImpl implements HiringService {
     @Override
     public Procedure archive(String uuid) {
         Procedure p = getByUuid(uuid);
-        if (p.getStatus() != ProcedureStatus.TASK_ORDER_SIGNED) {
-            throw new InvalidStateException("Archive requires TASK_ORDER_SIGNED.");
+        if (p.getStatus() != ProcedureStatus.TASK_ORDER_SUBMITTED) {
+            throw new InvalidStateException("Archive requires TASK_ORDER_SUBMITTED.");
         }
         p.setStatus(ProcedureStatus.COMPLETED);
         return procedureRepo.save(p);

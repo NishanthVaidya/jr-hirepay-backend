@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.Arrays;
 
 @Service
 @Transactional
@@ -166,7 +167,7 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
         ProcedureDocument savedSignedDocument = documentRepository.save(document);
 
         // Update procedure status
-        document.getProcedure().setStatus(com.justresults.hirepay.enumeration.ProcedureStatus.AGREEMENT_SIGNED);
+        document.getProcedure().setStatus(com.justresults.hirepay.enumeration.ProcedureStatus.AGREEMENT_SUBMITTED);
         procedureRepository.save(document.getProcedure());
 
         // Get front office user
@@ -290,7 +291,9 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
 
     @Override
     public List<UmbrellaAgreementResponse> getPendingReviewAgreements() {
-        List<ProcedureDocument> documents = documentRepository.findByStatusOrderByCreatedAtDesc(DocumentStatus.SIGNED);
+        List<ProcedureDocument> documents = documentRepository.findByStatusInOrderByCreatedAtDesc(
+            Arrays.asList(DocumentStatus.SIGNED, DocumentStatus.SUBMITTED)
+        );
 
         return documents.stream()
             .map(this::createUmbrellaAgreementResponseFromDocument)
@@ -344,7 +347,8 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
             frontOfficeUser.getDesignation(),
             sentBy,
             document.getCreatedAt().toString(),
-            document.getStatus() == DocumentStatus.SIGNED ? document.getCreatedAt().toString() : null,
+            document.getStatus() == DocumentStatus.SIGNED || document.getStatus() == DocumentStatus.SUBMITTED 
+          ? document.getCreatedAt().toString() : null,
             document.getStatus() == DocumentStatus.SIGNED ? extractSignerName(document.getNotes()) : null,
             document.getStatus() == DocumentStatus.APPROVED ? document.getActorEmail() : null,
             document.getStatus() == DocumentStatus.APPROVED ? document.getCreatedAt().toString() : null,

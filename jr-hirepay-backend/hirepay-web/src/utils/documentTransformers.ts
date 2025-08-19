@@ -46,8 +46,8 @@ export function transformToApprovedDocumentsBrowser(
 
   // Process each agreement
   agreements.forEach(agreement => {
-    // Include both SIGNED and APPROVED documents (finalized documents)
-    if (agreement.status !== 'SIGNED' && agreement.status !== 'APPROVED') {
+    // Include SIGNED, APPROVED, and SUBMITTED documents (finalized documents)
+    if (agreement.status !== 'SIGNED' && agreement.status !== 'APPROVED' && agreement.status !== 'SUBMITTED') {
       return;
     }
 

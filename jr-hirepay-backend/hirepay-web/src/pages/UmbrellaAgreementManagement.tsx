@@ -194,8 +194,8 @@ const DocumentManagement: React.FC = () => {
     // For front office users, show "RECEIVED" instead of "SENT"
     let displayStatus = (!isBackOffice && status === 'SENT') ? 'RECEIVED' : status;
     
-    // For form documents, show more user-friendly status names
-    if (documentType && isFormSubmission(documentType)) {
+    // Only apply form-specific status names for back office users
+    if (isBackOffice && documentType && isFormSubmission(documentType)) {
       if (status === 'SENT') displayStatus = 'FORM_SENT';
       if (status === 'SUBMITTED') displayStatus = 'FORM_SUBMITTED';
       if (status === 'APPROVED') displayStatus = 'FORM_APPROVED';
@@ -472,11 +472,14 @@ const DocumentManagement: React.FC = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                         </div>
-                        <div className="zforms__file-content">
-                          <div className="zforms__file-title">
-                            {getDocumentTypeLabel(document.documentType || 'UMBRELLA_AGREEMENT')}
-                          </div>
-                        </div>
+                        <button
+                          className="zforms__file-content zforms__file-title"
+                          onClick={() => handleDownloadDocument(document.documentId, document.documentName || 'document.pdf')}
+                          title="Download document"
+                          style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+                        >
+                          {getDocumentTypeLabel(document.documentType || 'UMBRELLA_AGREEMENT')}
+                        </button>
                       </div>
                       <div className="zforms__cell zforms__user" data-label="User">
                         <div className="zforms__user-name" title={document.frontOfficeUserName}>
@@ -655,8 +658,8 @@ const DocumentManagement: React.FC = () => {
                   <div className="zforms__cell">From</div>
                   <div className="zforms__cell">Status</div>
                   <div className="zforms__cell">Updated On</div>
-                  <div className="zforms__cell">Actions</div>
                   <div className="zforms__cell">Comments</div>
+                  <div className="zforms__cell">Actions</div>
                 </div>
                 {myDocuments
                   .filter(doc => doc.frontOfficeUserEmail === currentUser?.email)
@@ -688,48 +691,72 @@ const DocumentManagement: React.FC = () => {
                     <div className="zforms__cell zforms__date" data-label="Updated On">
                       {(document.signedAt || document.sentAt) ? new Date(document.signedAt || document.sentAt).toLocaleDateString() : '-'}
                     </div>
-                    <div className="zforms__cell zforms__actions" data-label="Actions">
-                      {/* Clean actions column - only buttons */}
-                      {document.status === 'SENT' && (
-                        <>
-                          {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') ? (
-                            <button
-                              onClick={() => toggleSignSection(document.documentId)}
-                              className="zforms__button zforms__button--primary"
-                            >
-                              {expandedSignId === document.documentId ? 'Hide Form' : 'Fill & Submit'}
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => toggleSignSection(document.documentId)}
-                              className="zforms__button zforms__button--primary"
-                            >
-                              {expandedSignId === document.documentId ? 'Hide Sign' : 'Sign'}
-                            </button>
-                          )}
-                        </>
-                      )}
-                      {(document.status === 'SIGNED' || document.status === 'APPROVED' || document.status === 'SUBMITTED') && (
-                        <button
-                          onClick={() => handleDownloadDocument(document.documentId, document.documentName || 'document.pdf')}
-                          className="zforms__button zforms__button--secondary"
-                        >
-                          Download
-                        </button>
-                      )}
-                    </div>
-                                        <div className="zforms__cell zforms__details" data-label="Comments">
+                    <div className="zforms__cell zforms__details" data-label="Comments">
                       {/* Comments column - only show back office comments */}
-                      {document.notes ? (
-                        <div className="zforms__comment" title={document.notes}>
-                          {document.notes}
-                        </div>
-                      ) : (
-                        <div className="zforms__comment-placeholder">
-                          No comments yet
-                        </div>
-                      )}
-                    </div>
+                      {(() => {
+                        // Extract only the back office comments (initial notes when document was sent)
+                        // Filter out system-generated notes like "Signed by:", "Reviewed by:", etc.
+                        if (!document.notes) {
+                          return (
+                            <div className="zforms__comment-placeholder">
+                              No comments
+                            </div>
+                          );
+                        }
+                        
+                        // Split notes by " | " and find the original back office comment
+                        const noteParts = document.notes.split(' | ');
+                        const backOfficeComment = noteParts.find(part => 
+                          !part.startsWith('Signed by:') && 
+                          !part.startsWith('Reviewed by:') && 
+                          !part.startsWith('Submitted by:') && 
+                          !part.startsWith('Completed:') && 
+                          !part.startsWith('Reviewed:') && 
+                          !part.startsWith('Signer notes:') && 
+                          !part.startsWith('Form notes:') && 
+                          !part.startsWith('Review notes:') && 
+                          !part.startsWith('Saved to Google Drive by:') &&
+                          !part.startsWith('Folder:') &&
+                          !part.startsWith('URL:')
+                        );
+                        
+                        if (backOfficeComment && backOfficeComment.trim()) {
+                          return (
+                            <div className="zforms__comment" title={backOfficeComment.trim()}>
+                              {backOfficeComment.trim()}
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div className="zforms__comment-placeholder">
+                              No comments
+                            </div>
+                          );
+                                                 }
+                       })()}
+                     </div>
+                     <div className="zforms__cell zforms__actions" data-label="Actions">
+                       {/* Actions column - buttons for document actions */}
+                       {document.status === 'SENT' && (
+                         <>
+                           {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') ? (
+                             <button
+                               onClick={() => toggleSignSection(document.documentId)}
+                               className="zforms__button zforms__button--primary"
+                             >
+                               {expandedSignId === document.documentId ? 'Hide Form' : 'Fill & Submit'}
+                             </button>
+                           ) : (
+                             <button
+                               onClick={() => toggleSignSection(document.documentId)}
+                               className="zforms__button zforms__button--primary"
+                             >
+                               {expandedSignId === document.documentId ? 'Hide Sign' : 'Sign'}
+                             </button>
+                           )}
+                         </>
+                       )}
+                     </div>
                      {/* Collapsible Sign Section */}
                      {expandedSignId === document.documentId && (
                        <div className="z-row z-row--review-expanded">
