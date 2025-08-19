@@ -26,16 +26,16 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="zform-login-page">
-      <div className="zform-login-container">
-        <div className="zform-login-card">
-          <h2 className="zform-login-title">Sign in to your account</h2>
-          <form className="zform-login-form" onSubmit={handleSubmit}>
+    <div className="zforms">
+      <div className="zforms__section">
+        <div className="zforms__login">
+          <h2 className="zforms__login-title">Sign in to your account</h2>
+          <form className="zforms__login-form" onSubmit={handleSubmit}>
             {error && (
-              <div className="zform-error-message">{error}</div>
+              <div className="zforms__error">{error}</div>
             )}
-            <div className="zform-form-group">
-              <label htmlFor="email" className="zform-form-label">
+            <div className="zforms__form-field">
+              <label htmlFor="email" className="zforms__form-label">
                 Email address
               </label>
               <input
@@ -44,14 +44,14 @@ const Login: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 required
-                className="zform-form-input"
+                className="zforms__form-input"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div className="zform-form-group">
-              <label htmlFor="password" className="zform-form-label">
+            <div className="zforms__form-field">
+              <label htmlFor="password" className="zforms__form-label">
                 Password
               </label>
               <input
@@ -60,20 +60,22 @@ const Login: React.FC = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="zform-form-input"
+                className="zforms__form-input"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="zform-login-button"
-            >
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
+            <div className="zforms__form-actions">
+              <button
+                type="submit"
+                disabled={loading}
+                className="zforms__button zforms__button--primary"
+              >
+                {loading ? 'Signing in...' : 'Sign in'}
+              </button>
+            </div>
           </form>
         </div>
       </div>

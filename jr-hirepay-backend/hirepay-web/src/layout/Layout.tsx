@@ -16,37 +16,37 @@ const Layout: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="zforms-layout">
       {/* Navigation */}
-      <nav className="bg-blue-600 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+      <nav className="zforms__nav">
+        <div className="zforms__nav-container">
+          <div className="zforms__nav-content">
             {/* Logo */}
-            <div className="flex items-center">
-              <Link to="/dashboard/home" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">H</span>
+            <div className="zforms__nav-logo">
+              <Link to="/dashboard/home" className="zforms__nav-logo-link">
+                <div className="zforms__nav-logo-icon">
+                  <span className="zforms__nav-logo-text">H</span>
                 </div>
-                <span className="text-xl font-bold text-gray-900">HirePay</span>
+                <span className="zforms__nav-logo-title">HirePay</span>
               </Link>
             </div>
             
-            <div className="flex items-center space-x-6">
+            <div className="zforms__nav-menu">
               {currentUser && (
                 <>
-                  <Link to="/" className="hover:text-blue-200">Home</Link>
+                  <Link to="/dashboard/home" className="zforms__nav-link">Home</Link>
                   {currentUser.roles.includes("ADMIN") && (
-                    <Link to="/admin" className="hover:text-blue-200">Admin</Link>
+                    <Link to="/dashboard/admin" className="zforms__nav-link">Admin</Link>
                   )}
                   {(currentUser.roles.includes("BACK_OFFICE") || currentUser.roles.includes("ADMIN")) && (
-                    <Link to="/umbrella-agreements" className="hover:text-blue-200">Umbrella Agreements</Link>
+                    <Link to="/dashboard/documents" className="zforms__nav-link">Documents</Link>
                   )}
-                  <span className="text-blue-200">
+                  <span className="zforms__nav-user">
                     {currentUser.email} ({currentUser.designation})
                   </span>
                   <button
                     onClick={handleLogout}
-                    className="bg-blue-700 hover:bg-blue-800 px-3 py-1 rounded text-sm"
+                    className="zforms__nav-button"
                   >
                     Logout
                   </button>
@@ -58,7 +58,7 @@ const Layout: React.FC = () => {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="zforms__main">
         <Outlet />
       </main>
     </div>
