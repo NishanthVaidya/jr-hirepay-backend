@@ -50,6 +50,7 @@ public class AuthController {
             throw new RuntimeException("Invalid credentials");
 
         var token = jwt.issue(user.getEmail(), Map.of(
+                "userId", user.getId().toString(),
                 "roles", user.getRoles().stream().map(Enum::name).toList(),
                 "designation", user.getDesignation(),
                 "fullName", user.getFullName()

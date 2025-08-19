@@ -1,21 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
-interface ScopeMessage {
-  id: string;
-  senderEmail: string;
-  senderName: string;
-  message: string;
-  timestamp: string;
-  scopeId?: string;
-}
+
 
 interface ScopeForm {
   projectTitle: string;
   projectDescription: string;
   deliverables: string;
   timeline: string;
-  budget: string;
   requirements: string;
   status: 'DRAFT' | 'IN_REVIEW' | 'APPROVED' | 'REJECTED';
 }
@@ -29,12 +21,9 @@ const ScopeCreation: React.FC = () => {
     projectDescription: '',
     deliverables: '',
     timeline: '',
-    budget: '',
     requirements: '',
     status: 'DRAFT'
   });
-  const [messages, setMessages] = useState<ScopeMessage[]>([]);
-  const [newMessage, setNewMessage] = useState('');
   const [isBackOffice, setIsBackOffice] = useState(false);
 
   useEffect(() => {
@@ -62,28 +51,7 @@ const ScopeCreation: React.FC = () => {
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!newMessage.trim()) return;
 
-    try {
-      const message: ScopeMessage = {
-        id: Date.now().toString(),
-        senderEmail: currentUser?.email || '',
-        senderName: currentUser?.designation || '',
-        message: newMessage,
-        timestamp: new Date().toISOString()
-      };
-
-      setMessages(prev => [...prev, message]);
-      setNewMessage('');
-      
-      // TODO: Implement message sending to backend
-      console.log('Sending message:', message);
-    } catch (err) {
-      setError('Failed to send message');
-      console.error(err);
-    }
-  };
 
   if (loading) {
     return (
@@ -125,10 +93,8 @@ const ScopeCreation: React.FC = () => {
           </div>
         )}
 
-        {/* Main Content - Hybrid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Side - Scope Form */}
-          <div className="zforms">
+        {/* Main Content */}
+        <div className="zforms">
             <div className="zforms__section">
               <div className="zforms__header">
                 <div className="zforms__title">
@@ -189,28 +155,15 @@ const ScopeCreation: React.FC = () => {
                   />
                 </div>
 
-                <div className="zforms__form-grid">
-                  <div className="zforms__form-field">
-                    <label className="zforms__form-label">Budget</label>
-                    <input
-                      type="text"
-                      value={scopeForm.budget}
-                      onChange={(e) => handleFormChange('budget', e.target.value)}
-                      className="zforms__form-input"
-                      placeholder="e.g., $50,000"
-                    />
-                  </div>
-
-                  <div className="zforms__form-field">
-                    <label className="zforms__form-label">Requirements</label>
-                    <input
-                      type="text"
-                      value={scopeForm.requirements}
-                      onChange={(e) => handleFormChange('requirements', e.target.value)}
-                      className="zforms__form-input"
-                      placeholder="Special requirements or constraints"
-                    />
-                  </div>
+                <div className="zforms__form-field">
+                  <label className="zforms__form-label">Requirements</label>
+                  <input
+                    type="text"
+                    value={scopeForm.requirements}
+                    onChange={(e) => handleFormChange('requirements', e.target.value)}
+                    className="zforms__form-input"
+                    placeholder="Special requirements or constraints"
+                  />
                 </div>
 
                 <div className="zforms__form-actions">
@@ -219,78 +172,6 @@ const ScopeCreation: React.FC = () => {
                     className="zforms__button zforms__button--primary"
                   >
                     Submit Scope
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Side - Chat Interface */}
-          <div className="zforms">
-            <div className="zforms__section">
-              <div className="zforms__header">
-                <div className="zforms__title">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  Scope Discussion
-                </div>
-                <span className="zforms__badge">
-                  {messages.length} messages
-                </span>
-              </div>
-
-              <div className="zforms__content">
-                {/* Messages Area */}
-                <div className="h-96 overflow-y-auto border border-gray-300 rounded-lg p-4 mb-4 bg-gray-50">
-                  {messages.length === 0 ? (
-                    <div className="text-center text-gray-500 py-8">
-                      <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                      <p>No messages yet. Start the discussion!</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {messages.map((message) => (
-                        <div
-                          key={message.id}
-                          className={`flex ${message.senderEmail === currentUser?.email ? 'justify-end' : 'justify-start'}`}
-                        >
-                          <div
-                            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                              message.senderEmail === currentUser?.email
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-white border border-gray-300'
-                            }`}
-                          >
-                            <div className="text-xs opacity-75 mb-1">
-                              {message.senderName} • {new Date(message.timestamp).toLocaleTimeString()}
-                            </div>
-                            <div className="text-sm">{message.message}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Message Input */}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                    className="zforms__form-input flex-1"
-                    placeholder="Type your message..."
-                  />
-                  <button
-                    onClick={handleSendMessage}
-                    className="zforms__button zforms__button--primary"
-                    disabled={!newMessage.trim()}
-                  >
-                    Send
                   </button>
                 </div>
               </div>

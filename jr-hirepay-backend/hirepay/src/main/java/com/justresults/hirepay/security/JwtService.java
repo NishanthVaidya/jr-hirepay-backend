@@ -37,4 +37,9 @@ public class JwtService {
         return Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token).getBody();
     }
+
+    public Long extractUserId(String token) {
+        io.jsonwebtoken.Claims claims = parse(token);
+        return Long.valueOf(claims.get("userId", String.class));
+    }
 }
