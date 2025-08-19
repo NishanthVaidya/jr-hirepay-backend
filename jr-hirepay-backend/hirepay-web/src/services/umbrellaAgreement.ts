@@ -119,10 +119,11 @@ export const umbrellaAgreementService = {
   },
 
   // Download document
-  downloadDocument: async (documentId: string): Promise<Blob> => {
+  downloadDocument: async (documentId: string): Promise<{ blob: Blob; contentType: string }> => {
     const response = await api.get(`/api/umbrella-agreements/${documentId}/download`, {
       responseType: 'blob',
     });
-    return response.data;
+    const contentType = response.headers['content-type'] || 'application/octet-stream';
+    return { blob: response.data, contentType };
   }
 };

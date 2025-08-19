@@ -175,11 +175,11 @@ const DocumentManagement: React.FC = () => {
   const handleDownloadDocument = async (documentId: string, documentName: string) => {
     try {
       const response = await umbrellaAgreementService.downloadDocument(documentId);
-      const blob = new Blob([response]);
+      const blob = new Blob([response.blob], { type: response.contentType });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = documentName || 'document.pdf';
+      link.download = documentName || 'document';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
