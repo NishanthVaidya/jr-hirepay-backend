@@ -3,9 +3,6 @@ import axios from "axios";
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_BASE || "http://localhost:8080",
   withCredentials: false,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // Add a request interceptor to include the auth token

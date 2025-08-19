@@ -107,12 +107,13 @@ public class UmbrellaAgreementDTOs {
         private String documentUrl;
         private String documentName;
         private String documentType;
+        private String notes;
 
         public UmbrellaAgreementResponse(String documentId, String status, String frontOfficeUserEmail, 
                                        String frontOfficeUserName, String sentBy, String sentAt, 
                                        String signedAt, String signerName, String reviewedBy, 
                                        String reviewedAt, String googleDriveUrl, String documentUrl, 
-                                       String documentName, String documentType) {
+                                       String documentName, String documentType, String notes) {
             this.documentId = documentId;
             this.status = status;
             this.frontOfficeUserEmail = frontOfficeUserEmail;
@@ -127,6 +128,7 @@ public class UmbrellaAgreementDTOs {
             this.documentUrl = documentUrl;
             this.documentName = documentName;
             this.documentType = documentType;
+            this.notes = notes;
         }
 
         // Getters
@@ -144,5 +146,6 @@ public class UmbrellaAgreementDTOs {
         public String getDocumentUrl() { return documentUrl; }
         public String getDocumentName() { return documentName; }
         public String getDocumentType() { return documentType; }
+        public String getNotes() { return notes; }
     }
 }

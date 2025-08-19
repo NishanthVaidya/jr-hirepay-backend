@@ -1,6 +1,19 @@
 import { UmbrellaAgreement, FrontOfficeUser } from '../services/umbrellaAgreement';
 
-export type DocStatus = "SIGNED" | "RECEIVED" | "PENDING" | "REJECTED";
+export type DocStatus = 
+  | "SIGNED" 
+  | "RECEIVED" 
+  | "PENDING" 
+  | "REJECTED"
+  | "SUBMITTED"
+  | "UNDER_REVIEW"
+  | "APPROVED"
+  | "PAID"
+  | "COMPLETED"
+  | "OVERDUE"
+  | "DRAFT"
+  | "ARCHIVED"
+  | "EXPIRED";
 
 export type DocumentItem = {
   id: string;
@@ -10,6 +23,7 @@ export type DocumentItem = {
   updatedAt: string;      // ISO date
   downloadUrl?: string;
   viewUrl?: string;
+  notes?: string;
 };
 
 export type UserItem = {
@@ -21,6 +35,7 @@ export type UserItem = {
 
 /**
  * Transform the existing UmbrellaAgreement data to the format expected by ApprovedDocumentsBrowser
+ * Shows documents that have been signed and/or approved (finalized documents)
  */
 export function transformToApprovedDocumentsBrowser(
   agreements: UmbrellaAgreement[],
@@ -31,8 +46,8 @@ export function transformToApprovedDocumentsBrowser(
 
   // Process each agreement
   agreements.forEach(agreement => {
-    // Only include SIGNED documents (approved documents)
-    if (agreement.status !== 'SIGNED') {
+    // Include both SIGNED and APPROVED documents (finalized documents)
+    if (agreement.status !== 'SIGNED' && agreement.status !== 'APPROVED') {
       return;
     }
 
@@ -62,7 +77,8 @@ export function transformToApprovedDocumentsBrowser(
       status: mapStatus(agreement.status),
       updatedAt: agreement.signedAt || agreement.sentAt,
       downloadUrl: agreement.documentUrl,
-      viewUrl: agreement.documentUrl
+      viewUrl: agreement.documentUrl,
+      notes: agreement.notes
     };
 
     user.documents.push(documentItem);
@@ -85,6 +101,24 @@ function mapStatus(status: string): DocStatus {
       return 'PENDING';
     case 'REJECTED':
       return 'REJECTED';
+    case 'SUBMITTED':
+      return 'SUBMITTED';
+    case 'UNDER_REVIEW':
+      return 'UNDER_REVIEW';
+    case 'APPROVED':
+      return 'APPROVED';
+    case 'PAID':
+      return 'PAID';
+    case 'COMPLETED':
+      return 'COMPLETED';
+    case 'OVERDUE':
+      return 'OVERDUE';
+    case 'DRAFT':
+      return 'DRAFT';
+    case 'ARCHIVED':
+      return 'ARCHIVED';
+    case 'EXPIRED':
+      return 'EXPIRED';
     default:
       return 'PENDING';
   }
@@ -126,4 +160,71 @@ function getDocumentTypeCategory(documentType: string): string {
   };
   
   return categories[documentType] || 'Document';
+}
+
+/**
+ * Get the appropriate workflow statuses for a document type
+ */
+export function getDocumentWorkflowStatuses(documentType: string): string[] {
+  const workflows: Record<string, string[]> = {
+    // Agreement documents - require signature workflow
+    'UMBRELLA_AGREEMENT': ['DRAFT', 'SENT', 'SIGNED', 'APPROVED', 'REJECTED'],
+    'AGREEMENT_MODIFICATION': ['DRAFT', 'SENT', 'SIGNED', 'APPROVED', 'REJECTED'],
+    'TASK_ORDER': ['DRAFT', 'SENT', 'SIGNED', 'APPROVED', 'REJECTED'],
+    'TASK_ORDER_MODIFICATION': ['DRAFT', 'SENT', 'SIGNED', 'APPROVED', 'REJECTED'],
+    
+    // Form documents - submission workflow
+    'TAX_FORM_W9': ['DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED'],
+    'TAX_FORM_W8BEN': ['DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED'],
+    'PAYMENT_AUTH_FORM': ['DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED'],
+    
+    // Invoice documents - payment workflow
+    'INVOICE': ['DRAFT', 'SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'PAID', 'OVERDUE'],
+    
+    // Deliverable documents - completion workflow
+    'DELIVERABLES_PROOF': ['DRAFT', 'SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'COMPLETED']
+  };
+  
+  return workflows[documentType] || ['DRAFT', 'SENT', 'SIGNED', 'APPROVED', 'REJECTED'];
+}
+
+/**
+ * Check if a document type requires signature workflow
+ */
+export function requiresSignatureWorkflow(documentType: string): boolean {
+  const signatureWorkflowTypes = [
+    'UMBRELLA_AGREEMENT',
+    'AGREEMENT_MODIFICATION', 
+    'TASK_ORDER',
+    'TASK_ORDER_MODIFICATION'
+  ];
+  
+  return signatureWorkflowTypes.includes(documentType);
+}
+
+/**
+ * Check if a document type is a form submission
+ */
+export function isFormSubmission(documentType: string): boolean {
+  const formTypes = [
+    'TAX_FORM_W9',
+    'TAX_FORM_W8BEN',
+    'PAYMENT_AUTH_FORM'
+  ];
+  
+  return formTypes.includes(documentType);
+}
+
+/**
+ * Check if a document type is payment-related
+ */
+export function isPaymentDocument(documentType: string): boolean {
+  return documentType === 'INVOICE';
+}
+
+/**
+ * Check if a document type is deliverable-related
+ */
+export function isDeliverableDocument(documentType: string): boolean {
+  return documentType === 'DELIVERABLES_PROOF';
 }

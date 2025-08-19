@@ -1,10 +1,7 @@
 package com.justresults.hirepay.business.services;
-
-import com.justresults.hirepay.business.services.DocumentWorkflowService;
 import com.justresults.hirepay.domain.Procedure;
 import com.justresults.hirepay.domain.ProcedureDocument;
 import com.justresults.hirepay.domain.User;
-import com.justresults.hirepay.dto.DocumentWorkflowDTOs.SendDocumentRequest;
 import com.justresults.hirepay.dto.UmbrellaAgreementDTOs.*;
 import com.justresults.hirepay.enumeration.DocReference;
 import com.justresults.hirepay.enumeration.DocumentStatus;
@@ -32,18 +29,15 @@ import java.util.Set;
 @Transactional
 public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
 
-    private final DocumentWorkflowService documentWorkflowService;
     private final DocumentStorageService documentStorageService;
     private final ProcedureRepository procedureRepository;
     private final ProcedureDocumentRepository documentRepository;
     private final UserRepository userRepository;
 
-    public UmbrellaAgreementServiceImpl(DocumentWorkflowService documentWorkflowService,
-                                       DocumentStorageService documentStorageService,
+    public UmbrellaAgreementServiceImpl(DocumentStorageService documentStorageService,
                                        ProcedureRepository procedureRepository,
                                        ProcedureDocumentRepository documentRepository,
                                        UserRepository userRepository) {
-        this.documentWorkflowService = documentWorkflowService;
         this.documentStorageService = documentStorageService;
         this.procedureRepository = procedureRepository;
         this.documentRepository = documentRepository;
@@ -104,7 +98,7 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
     }
 
     @Override
-    public UmbrellaAgreementResponse signAgreement(String signerEmail, SignAgreementRequest request) throws IOException {
+    public UmbrellaAgreementResponse signAgreement(String signerEmail, SignAgreementRequest request, MultipartFile signedDocument) throws IOException {
         // Get the document
         ProcedureDocument document = documentRepository.findById(Long.valueOf(request.getDocumentId()))
             .orElseThrow(() -> new NotFoundException("Document not found"));
@@ -119,16 +113,55 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
             throw new InvalidStateException("Document must be in SENT status to be signed");
         }
 
-        // Create signed version
-        byte[] signedContent = generateSignedAgreementContent(document, request.getSignerName(), request.getHasReviewed());
+        // Create signed version content or use uploaded document
+        byte[] signedContent;
+        String finalFileName;
+        if (signedDocument != null && !signedDocument.isEmpty()) {
+            signedContent = signedDocument.getBytes();
+            finalFileName = signedDocument.getOriginalFilename();
+        } else {
+            signedContent = generateSignedAgreementContent(document, request.getSignerName(), request.getHasReviewed());
+            finalFileName = "signed-" + extractDocumentName(document.getLocation());
+        }
 
         // Store signed document
-        String signedLocation = documentStorageService.store(document.getProcedure().getUuid(), signedContent, "signed-umbrella-agreement.pdf");
+        String signedLocation = documentStorageService.store(document.getProcedure().getUuid(), signedContent, finalFileName);
 
-        // Update the original document to SIGNED status instead of creating a new one
-        document.setStatus(DocumentStatus.SIGNED);
-        document.setNotes("Signed by: " + request.getSignerName() + " | Reviewed: " + request.getHasReviewed() + 
-                         (request.getNotes() != null ? " | Notes: " + request.getNotes() : ""));
+        // Update the original document status based on document type
+        // Persist the new file location so subsequent downloads return the submitted version
+        document.setLocation(signedLocation);
+        
+        // Determine if this is a form document
+        boolean isFormDocument = isFormDocumentType(document.getDocReference());
+        
+        // Set appropriate status based on document type
+        if (isFormDocument) {
+            document.setStatus(DocumentStatus.SUBMITTED);
+        } else {
+            document.setStatus(DocumentStatus.SIGNED);
+        }
+        
+        String existingNotes = document.getNotes();
+        StringBuilder notesBuilder = new StringBuilder();
+        if (existingNotes != null && !existingNotes.isBlank()) {
+            notesBuilder.append(existingNotes.trim()).append(" | ");
+        }
+        
+        if (isFormDocument) {
+            notesBuilder.append("Submitted by: ").append(request.getSignerName())
+                .append(" | Completed: ").append(request.getHasReviewed());
+            if (request.getNotes() != null && !request.getNotes().isBlank()) {
+                notesBuilder.append(" | Form notes: ").append(request.getNotes());
+            }
+        } else {
+            notesBuilder.append("Signed by: ").append(request.getSignerName())
+                .append(" | Reviewed: ").append(request.getHasReviewed());
+            if (request.getNotes() != null && !request.getNotes().isBlank()) {
+                notesBuilder.append(" | Signer notes: ").append(request.getNotes());
+            }
+        }
+        
+        document.setNotes(notesBuilder.toString());
         
         ProcedureDocument savedSignedDocument = documentRepository.save(document);
 
@@ -149,9 +182,9 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
         ProcedureDocument document = documentRepository.findById(Long.valueOf(request.getDocumentId()))
             .orElseThrow(() -> new NotFoundException("Document not found"));
 
-        // Validate document status
-        if (document.getStatus() != DocumentStatus.SIGNED) {
-            throw new InvalidStateException("Document must be in SIGNED status to be reviewed");
+        // Validate document status - allow both SIGNED and SUBMITTED documents to be reviewed
+        if (document.getStatus() != DocumentStatus.SIGNED && document.getStatus() != DocumentStatus.SUBMITTED) {
+            throw new InvalidStateException("Document must be in SIGNED or SUBMITTED status to be reviewed");
         }
 
         // Update document status
@@ -318,7 +351,8 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
             extractGoogleDriveUrl(document.getNotes()),
             document.getLocation(),
             documentName,
-            document.getDocReference().name()
+            document.getDocReference().name(),
+            document.getNotes()
         );
     }
 
@@ -354,5 +388,14 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
             // If the document type is not a valid enum value, default to UMBRELLA_AGREEMENT
             return DocReference.UMBRELLA_AGREEMENT;
         }
+    }
+    
+    /**
+     * Check if a document type is a form submission
+     */
+    private boolean isFormDocumentType(DocReference docReference) {
+        return docReference == DocReference.TAX_FORM_W9 ||
+               docReference == DocReference.TAX_FORM_W8BEN ||
+               docReference == DocReference.PAYMENT_AUTH_FORM;
     }
 }

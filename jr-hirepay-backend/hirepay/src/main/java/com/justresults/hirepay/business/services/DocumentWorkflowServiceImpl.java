@@ -103,6 +103,9 @@ public class DocumentWorkflowServiceImpl implements DocumentWorkflowService {
         ProcedureDocument document = documentRepository.findById(Long.valueOf(documentId))
             .orElseThrow(() -> new NotFoundException("Document not found: " + documentId));
         
+        // Validate status transition based on document type
+        validateStatusTransition(document.getDocReference(), document.getStatus(), request.getStatus());
+        
         document.setStatus(request.getStatus());
         if (request.getNotes() != null) {
             document.setNotes(request.getNotes());
@@ -217,5 +220,97 @@ public class DocumentWorkflowServiceImpl implements DocumentWorkflowService {
             document.getNotes(),
             document.getProcedure().getUuid()
         );
+    }
+    
+    /**
+     * Validate status transitions based on document type
+     */
+    private void validateStatusTransition(DocReference documentType, DocumentStatus currentStatus, DocumentStatus newStatus) {
+        // Define valid transitions for each document type
+        switch (documentType) {
+            case UMBRELLA_AGREEMENT:
+            case AGREEMENT_MODIFICATION:
+            case TASK_ORDER:
+            case TASK_ORDER_MODIFICATION:
+                // Agreement workflow: DRAFT -> SENT -> SIGNED -> APPROVED/REJECTED
+                validateAgreementStatusTransition(currentStatus, newStatus);
+                break;
+                
+            case TAX_FORM_W9:
+            case TAX_FORM_W8BEN:
+            case PAYMENT_AUTH_FORM:
+                // Form workflow: DRAFT -> SUBMITTED -> APPROVED/REJECTED
+                validateFormStatusTransition(currentStatus, newStatus);
+                break;
+                
+            case INVOICE:
+                // Invoice workflow: DRAFT -> SUBMITTED -> UNDER_REVIEW -> APPROVED -> PAID/OVERDUE
+                validateInvoiceStatusTransition(currentStatus, newStatus);
+                break;
+                
+            case DELIVERABLES_PROOF:
+                // Deliverable workflow: DRAFT -> SUBMITTED -> UNDER_REVIEW -> APPROVED -> COMPLETED
+                validateDeliverableStatusTransition(currentStatus, newStatus);
+                break;
+                
+            default:
+                // Allow any transition for unknown document types
+                break;
+        }
+    }
+    
+    private void validateAgreementStatusTransition(DocumentStatus currentStatus, DocumentStatus newStatus) {
+        // Agreement documents follow: DRAFT -> SENT -> SIGNED -> APPROVED/REJECTED
+        if (currentStatus == DocumentStatus.DRAFT && newStatus != DocumentStatus.SENT) {
+            throw new InvalidStateException("Draft agreements can only be sent");
+        }
+        if (currentStatus == DocumentStatus.SENT && newStatus != DocumentStatus.SIGNED) {
+            throw new InvalidStateException("Sent agreements can only be signed");
+        }
+        if (currentStatus == DocumentStatus.SIGNED && newStatus != DocumentStatus.APPROVED && newStatus != DocumentStatus.REJECTED) {
+            throw new InvalidStateException("Signed agreements can only be approved or rejected");
+        }
+    }
+    
+    private void validateFormStatusTransition(DocumentStatus currentStatus, DocumentStatus newStatus) {
+        // Form documents follow: DRAFT -> SUBMITTED -> APPROVED/REJECTED
+        if (currentStatus == DocumentStatus.DRAFT && newStatus != DocumentStatus.SUBMITTED) {
+            throw new InvalidStateException("Draft forms can only be submitted");
+        }
+        if (currentStatus == DocumentStatus.SUBMITTED && newStatus != DocumentStatus.APPROVED && newStatus != DocumentStatus.REJECTED) {
+            throw new InvalidStateException("Submitted forms can only be approved or rejected");
+        }
+    }
+    
+    private void validateInvoiceStatusTransition(DocumentStatus currentStatus, DocumentStatus newStatus) {
+        // Invoice documents follow: DRAFT -> SUBMITTED -> UNDER_REVIEW -> APPROVED -> PAID/OVERDUE
+        if (currentStatus == DocumentStatus.DRAFT && newStatus != DocumentStatus.SUBMITTED) {
+            throw new InvalidStateException("Draft invoices can only be submitted");
+        }
+        if (currentStatus == DocumentStatus.SUBMITTED && newStatus != DocumentStatus.UNDER_REVIEW) {
+            throw new InvalidStateException("Submitted invoices can only be put under review");
+        }
+        if (currentStatus == DocumentStatus.UNDER_REVIEW && newStatus != DocumentStatus.APPROVED && newStatus != DocumentStatus.REJECTED) {
+            throw new InvalidStateException("Invoices under review can only be approved or rejected");
+        }
+        if (currentStatus == DocumentStatus.APPROVED && newStatus != DocumentStatus.PAID && newStatus != DocumentStatus.OVERDUE) {
+            throw new InvalidStateException("Approved invoices can only be marked as paid or overdue");
+        }
+    }
+    
+    private void validateDeliverableStatusTransition(DocumentStatus currentStatus, DocumentStatus newStatus) {
+        // Deliverable documents follow: DRAFT -> SUBMITTED -> UNDER_REVIEW -> APPROVED -> COMPLETED
+        if (currentStatus == DocumentStatus.DRAFT && newStatus != DocumentStatus.SUBMITTED) {
+            throw new InvalidStateException("Draft deliverables can only be submitted");
+        }
+        if (currentStatus == DocumentStatus.SUBMITTED && newStatus != DocumentStatus.UNDER_REVIEW) {
+            throw new InvalidStateException("Submitted deliverables can only be put under review");
+        }
+        if (currentStatus == DocumentStatus.UNDER_REVIEW && newStatus != DocumentStatus.APPROVED && newStatus != DocumentStatus.REJECTED) {
+            throw new InvalidStateException("Deliverables under review can only be approved or rejected");
+        }
+        if (currentStatus == DocumentStatus.APPROVED && newStatus != DocumentStatus.COMPLETED) {
+            throw new InvalidStateException("Approved deliverables can only be marked as completed");
+        }
     }
 }

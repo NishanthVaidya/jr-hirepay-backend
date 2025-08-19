@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useDeferredValue } from 'react';
 import styles from './ApprovedDocumentsBrowser.module.css';
-
-type DocStatus = "SIGNED" | "RECEIVED" | "PENDING" | "REJECTED";
+import { DocStatus } from '../utils/documentTransformers';
 
 type DocumentItem = {
   id: string;
@@ -11,6 +10,7 @@ type DocumentItem = {
   updatedAt: string;      // ISO date
   downloadUrl?: string;
   viewUrl?: string;
+  notes?: string;
 };
 
 type UserItem = {
@@ -90,6 +90,7 @@ const ApprovedDocumentsBrowser: React.FC<ApprovedDocumentsBrowserProps> = ({
 
   const getStatusBadge = (status: DocStatus) => {
     const statusClass = status === 'SIGNED' ? styles.statusSigned : 
+                       status === 'APPROVED' ? styles.statusSigned : // Use same style as SIGNED for APPROVED
                        status === 'RECEIVED' ? styles.statusReceived :
                        status === 'PENDING' ? styles.statusPending :
                        styles.statusRejected;
@@ -129,7 +130,7 @@ const ApprovedDocumentsBrowser: React.FC<ApprovedDocumentsBrowserProps> = ({
         <div className={styles.usersList}>
           {paginatedUsers.map((user) => {
             const isExpanded = expandedUsers.has(user.id);
-            const approvedDocs = user.documents.filter(doc => doc.status === 'SIGNED');
+            const approvedDocs = user.documents.filter(doc => doc.status === 'SIGNED' || doc.status === 'APPROVED');
             
             return (
               <div key={user.id} className={styles.userRow}>
@@ -219,6 +220,11 @@ const ApprovedDocumentsBrowser: React.FC<ApprovedDocumentsBrowserProps> = ({
                                   </svg>
                                   Download
                                 </button>
+                                {doc.notes && (
+                                  <span className={styles.docNote} title={doc.notes}>
+                                    {doc.notes}
+                                  </span>
+                                )}
                               </div>
                             </div>
                           </div>

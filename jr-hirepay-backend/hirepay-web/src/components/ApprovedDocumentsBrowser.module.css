@@ -271,6 +271,15 @@
   gap: 0.5rem;
 }
 
+.docNote {
+  margin-left: 0.5rem;
+  color: var(--zforms-muted);
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .actionButton {
   display: flex;
   align-items: center;

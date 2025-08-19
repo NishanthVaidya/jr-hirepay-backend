@@ -15,7 +15,7 @@ public interface UmbrellaAgreementService {
     /**
      * Sign the umbrella agreement (front office user)
      */
-    UmbrellaAgreementResponse signAgreement(String signerEmail, SignAgreementRequest request) throws IOException;
+    UmbrellaAgreementResponse signAgreement(String signerEmail, SignAgreementRequest request, org.springframework.web.multipart.MultipartFile signedDocument) throws IOException;
 
     /**
      * Review the signed agreement (back office user)

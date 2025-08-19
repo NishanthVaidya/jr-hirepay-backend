@@ -69,15 +69,43 @@ public class UmbrellaAgreementController {
         }
     }
 
-    // Sign agreement (front office user)
-    @PostMapping("/sign")
+    // Sign agreement (front office user) - supports optional signed file upload
+    @PostMapping(value = "/sign", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UmbrellaAgreementResponse> signAgreement(
             @RequestHeader("Authorization") String authHeader,
-            @Valid @RequestBody SignAgreementRequest request) throws IOException {
-        
-        String signerEmail = extractEmailFromAuthHeader(authHeader);
-        UmbrellaAgreementResponse response = umbrellaAgreementService.signAgreement(signerEmail, request);
-        return ResponseEntity.ok(response);
+            @RequestParam("documentId") String documentId,
+            @RequestParam("signerName") String signerName,
+            @RequestParam("hasReviewed") Boolean hasReviewed,
+            @RequestParam(value = "notes", required = false) String notes,
+            @RequestPart(value = "signedDocument", required = false) MultipartFile signedDocument) throws IOException {
+        try {
+            System.out.println("Sign agreement called");
+            System.out.println("documentId: " + documentId);
+            System.out.println("signerName: " + signerName);
+            System.out.println("hasReviewed: " + hasReviewed);
+            System.out.println("signedDocument: " + (signedDocument != null ? signedDocument.getOriginalFilename() : "none"));
+
+            String signerEmail = extractEmailFromAuthHeader(authHeader);
+
+            SignAgreementRequest request = new SignAgreementRequest();
+            request.setDocumentId(documentId);
+            request.setSignerName(signerName);
+            request.setHasReviewed(hasReviewed);
+            request.setNotes(notes);
+
+            UmbrellaAgreementResponse response = umbrellaAgreementService.signAgreement(signerEmail, request, signedDocument);
+            return ResponseEntity.ok(response);
+        } catch (com.justresults.hirepay.util.NotFoundException e) {
+            System.err.println("Sign error (NotFound): " + e.getMessage());
+            return ResponseEntity.status(404).build();
+        } catch (com.justresults.hirepay.util.InvalidStateException e) {
+            System.err.println("Sign error (InvalidState): " + e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            System.err.println("Unexpected sign error: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     // Review signed agreement (back office only)

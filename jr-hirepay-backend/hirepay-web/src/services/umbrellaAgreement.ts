@@ -23,6 +23,7 @@ export interface UmbrellaAgreement {
   documentUrl?: string;
   documentName?: string;
   documentType?: string;
+  notes?: string;
 }
 
 export interface SendUmbrellaAgreementRequest {
@@ -71,17 +72,19 @@ export const umbrellaAgreementService = {
       formData.append('documentType', request.documentType);
     }
 
-    const response = await api.post('/api/umbrella-agreements/send', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await api.post('/api/umbrella-agreements/send', formData);
     return response.data;
   },
 
-  // Sign an agreement
-  signAgreement: async (request: SignAgreementRequest): Promise<UmbrellaAgreement> => {
-    const response = await api.post('/api/umbrella-agreements/sign', request);
+  // Sign an agreement (optionally uploading a signed document)
+  signAgreement: async (request: SignAgreementRequest & { signedDocument?: File }): Promise<UmbrellaAgreement> => {
+    const formData = new FormData();
+    formData.append('documentId', request.documentId);
+    formData.append('signerName', request.signerName);
+    formData.append('hasReviewed', String(request.hasReviewed));
+    if (request.notes) formData.append('notes', request.notes);
+    if (request.signedDocument) formData.append('signedDocument', request.signedDocument);
+    const response = await api.post('/api/umbrella-agreements/sign', formData);
     return response.data;
   },
 

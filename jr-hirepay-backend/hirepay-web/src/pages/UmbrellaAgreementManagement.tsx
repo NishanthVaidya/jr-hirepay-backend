@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { umbrellaAgreementService, FrontOfficeUser, UmbrellaAgreement } from '../services/umbrellaAgreement';
 import { useAuth } from '../contexts/AuthContext';
 import ApprovedDocumentsBrowser from '../components/ApprovedDocumentsBrowser';
-import { transformToApprovedDocumentsBrowser } from '../utils/documentTransformers';
+import { transformToApprovedDocumentsBrowser, isFormSubmission } from '../utils/documentTransformers';
 
 const DocumentManagement: React.FC = () => {
   const { currentUser } = useAuth();
@@ -15,8 +15,11 @@ const DocumentManagement: React.FC = () => {
   const [selectedDocumentType, setSelectedDocumentType] = useState<string>('UMBRELLA_AGREEMENT');
   const [notes, setNotes] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [showSignModal, setShowSignModal] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<UmbrellaAgreement | null>(null);
+  const [expandedSignId, setExpandedSignId] = useState<string | null>(null);
+  const [signerName, setSignerName] = useState('');
+  const [hasReviewedConfirm, setHasReviewedConfirm] = useState(false);
+  const [signNotes, setSignNotes] = useState('');
+  const [signedFile, setSignedFile] = useState<File | null>(null);
   const [expandedReviewId, setExpandedReviewId] = useState<string | null>(null);
   const [reviewNotes, setReviewNotes] = useState('');
   const [reviewDecision, setReviewDecision] = useState<'approve' | 'reject'>('approve');
@@ -114,19 +117,36 @@ const DocumentManagement: React.FC = () => {
     }
   };
 
-  const handleSignDocument = async (signerName: string, hasReviewed: boolean, signNotes?: string) => {
-    if (!selectedDocument) return;
+  // removed legacy modal handler
 
+  const toggleSignSection = (documentId: string) => {
+    if (expandedSignId === documentId) {
+      setExpandedSignId(null);
+      setSignerName('');
+      setHasReviewedConfirm(false);
+      setSignNotes('');
+    } else {
+      setExpandedSignId(documentId);
+      setSignerName('');
+      setHasReviewedConfirm(false);
+      setSignNotes('');
+    }
+  };
+
+  const handleInlineSign = async (document: UmbrellaAgreement) => {
     try {
       await umbrellaAgreementService.signAgreement({
-        documentId: selectedDocument.documentId,
+        documentId: document.documentId,
         signerName,
-        hasReviewed,
-        notes: signNotes
+        hasReviewed: hasReviewedConfirm,
+        notes: signNotes || undefined,
+        signedDocument: signedFile || undefined
       });
-      
-      setShowSignModal(false);
-      setSelectedDocument(null);
+      setExpandedSignId(null);
+      setSignerName('');
+      setHasReviewedConfirm(false);
+      setSignNotes('');
+      setSignedFile(null);
       loadData();
       alert('Document signed successfully!');
     } catch (err) {
@@ -170,17 +190,36 @@ const DocumentManagement: React.FC = () => {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, documentType?: string) => {
     // For front office users, show "RECEIVED" instead of "SENT"
-    const displayStatus = (!isBackOffice && status === 'SENT') ? 'RECEIVED' : status;
+    let displayStatus = (!isBackOffice && status === 'SENT') ? 'RECEIVED' : status;
+    
+    // For form documents, show more user-friendly status names
+    if (documentType && isFormSubmission(documentType)) {
+      if (status === 'SENT') displayStatus = 'FORM_SENT';
+      if (status === 'SUBMITTED') displayStatus = 'FORM_SUBMITTED';
+      if (status === 'APPROVED') displayStatus = 'FORM_APPROVED';
+      if (status === 'REJECTED') displayStatus = 'FORM_REJECTED';
+    }
     
     const statusClasses = {
       'SENT': 'zforms__badge--sent',
       'RECEIVED': 'zforms__badge--sent',
+      'FORM_SENT': 'zforms__badge--sent',
       'SIGNED': 'zforms__badge--signed',
       'APPROVED': 'zforms__badge--approved',
+      'FORM_APPROVED': 'zforms__badge--approved',
       'REJECTED': 'zforms__badge--rejected',
-      'DRAFT': 'zforms__badge--status'
+      'FORM_REJECTED': 'zforms__badge--rejected',
+      'DRAFT': 'zforms__badge--draft',
+      'SUBMITTED': 'zforms__badge--submitted',
+      'FORM_SUBMITTED': 'zforms__badge--submitted',
+      'UNDER_REVIEW': 'zforms__badge--review',
+      'PAID': 'zforms__badge--paid',
+      'COMPLETED': 'zforms__badge--completed',
+      'OVERDUE': 'zforms__badge--overdue',
+      'ARCHIVED': 'zforms__badge--archived',
+      'EXPIRED': 'zforms__badge--expired'
     };
     
     return (
@@ -460,6 +499,11 @@ const DocumentManagement: React.FC = () => {
                         >
                           {expandedReviewId === document.documentId ? 'Hide Review' : 'Review'}
                         </button>
+                        {document.notes && (
+                          <div className="zforms__comment" title={document.notes}>
+                            {document.notes}
+                          </div>
+                        )}
                       </div>
                     </div>
                     
@@ -551,155 +595,255 @@ const DocumentManagement: React.FC = () => {
           </div>
         )}
 
-        {/* Approved Documents Browser Section */}
-        <div className="zforms">
-          <div className="zforms__section">
-            <div className="zforms__header">
-              <div className="zforms__title">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                Approved Documents
+        {/* Documents Section - role specific */}
+        {isBackOffice ? (
+          // Back office: show Approved Documents Browser
+          <div className="zforms">
+            <div className="zforms__section">
+              <div className="zforms__header">
+                <div className="zforms__title">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  Approved Documents
+                </div>
+                <span className="zforms__badge">
+                  {transformToApprovedDocumentsBrowser(myDocuments, frontOfficeUsers).length} users
+                </span>
               </div>
-              <span className="zforms__badge">
-                {transformToApprovedDocumentsBrowser(myDocuments, frontOfficeUsers).length} users
-              </span>
+              
+              <p className="zforms__lead">
+                Browse approved documents organized by user. Click on a user row to expand and view their signed documents.
+                Use the search to filter users by name.
+              </p>
+              
+              <ApprovedDocumentsBrowser
+                users={transformToApprovedDocumentsBrowser(myDocuments, frontOfficeUsers)}
+                pageSize={20}
+                onViewDocument={(doc, user) => {
+                  if (doc.viewUrl) {
+                    window.open(doc.viewUrl, '_blank');
+                  }
+                }}
+                onDownloadDocument={(doc, user) => {
+                  if (doc.downloadUrl) {
+                    window.open(doc.downloadUrl, '_blank');
+                  }
+                }}
+              />
             </div>
-            
-            <p className="zforms__lead">
-              Browse approved documents organized by user. Click on a user row to expand and view their signed documents.
-              Use the search to filter users by name.
-            </p>
-            
-            <ApprovedDocumentsBrowser
-              users={transformToApprovedDocumentsBrowser(myDocuments, frontOfficeUsers)}
-              pageSize={20}
-              onViewDocument={(doc, user) => {
-                if (doc.viewUrl) {
-                  window.open(doc.viewUrl, '_blank');
-                }
-              }}
-              onDownloadDocument={(doc, user) => {
-                if (doc.downloadUrl) {
-                  window.open(doc.downloadUrl, '_blank');
-                }
-              }}
-            />
           </div>
-        </div>
+        ) : (
+          // Front office: show My Documents list with actions and comments
+          <div className="zforms">
+            <div className="zforms__section">
+              <div className="zforms__header">
+                <div className="zforms__title">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  My Documents
+                </div>
+                <span className="zforms__badge">
+                  {myDocuments.filter(d => d.frontOfficeUserEmail === currentUser?.email).length}
+                </span>
+              </div>
+
+              <div className="zforms__table">
+                <div className="zforms__head">
+                  <div className="zforms__cell">Document Type</div>
+                  <div className="zforms__cell">From</div>
+                  <div className="zforms__cell">Status</div>
+                  <div className="zforms__cell">Updated On</div>
+                  <div className="zforms__cell">Actions</div>
+                  <div className="zforms__cell">Comments</div>
+                </div>
+                {myDocuments
+                  .filter(doc => doc.frontOfficeUserEmail === currentUser?.email)
+                  .map((document, index) => (
+                  <div key={document.documentId} className={`z-row ${index % 2 === 0 ? 'z-row--even' : 'z-row--odd'}`}>
+                    <div className="zforms__cell zforms__file" data-label="Document Type">
+                      <div className="z-icon">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <button
+                        className="zforms__file-content zforms__file-title"
+                        onClick={() => handleDownloadDocument(document.documentId, document.documentName || 'document.pdf')}
+                        title="Download document"
+                        style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+                      >
+                        {getDocumentTypeLabel(document.documentType || 'UMBRELLA_AGREEMENT')}
+                      </button>
+                    </div>
+                    <div className="zforms__cell zforms__user" data-label="From">
+                      <div className="zforms__user-name" title={document.sentBy}>
+                        {document.sentBy}
+                      </div>
+                    </div>
+                    <div className="zforms__cell zforms__status" data-label="Status">
+                      {getStatusBadge(document.status, document.documentType)}
+                    </div>
+                    <div className="zforms__cell zforms__date" data-label="Updated On">
+                      {(document.signedAt || document.sentAt) ? new Date(document.signedAt || document.sentAt).toLocaleDateString() : '-'}
+                    </div>
+                    <div className="zforms__cell zforms__actions" data-label="Actions">
+                      {/* Clean actions column - only buttons */}
+                      {document.status === 'SENT' && (
+                        <>
+                          {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') ? (
+                            <button
+                              onClick={() => toggleSignSection(document.documentId)}
+                              className="zforms__button zforms__button--primary"
+                            >
+                              {expandedSignId === document.documentId ? 'Hide Form' : 'Fill & Submit'}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => toggleSignSection(document.documentId)}
+                              className="zforms__button zforms__button--primary"
+                            >
+                              {expandedSignId === document.documentId ? 'Hide Sign' : 'Sign'}
+                            </button>
+                          )}
+                        </>
+                      )}
+                      {(document.status === 'SIGNED' || document.status === 'APPROVED' || document.status === 'SUBMITTED') && (
+                        <button
+                          onClick={() => handleDownloadDocument(document.documentId, document.documentName || 'document.pdf')}
+                          className="zforms__button zforms__button--secondary"
+                        >
+                          Download
+                        </button>
+                      )}
+                    </div>
+                                        <div className="zforms__cell zforms__details" data-label="Comments">
+                      {/* Comments column - only show back office comments */}
+                      {document.notes ? (
+                        <div className="zforms__comment" title={document.notes}>
+                          {document.notes}
+                        </div>
+                      ) : (
+                        <div className="zforms__comment-placeholder">
+                          No comments yet
+                        </div>
+                      )}
+                    </div>
+                     {/* Collapsible Sign Section */}
+                     {expandedSignId === document.documentId && (
+                       <div className="z-row z-row--review-expanded">
+                         <div className="zforms__cell zforms__review-section" style={{ gridColumn: '1 / -1' }}>
+                           <div className="sign-grid">
+                                                         <form onSubmit={(e) => { e.preventDefault(); handleInlineSign(document); }} className="sign-grid__form">
+                              <div className="sign-card">
+                                {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') ? (
+                                  <>
+                                    <label className="sign-label">Your Full Name *</label>
+                                    <input
+                                      type="text"
+                                      value={signerName}
+                                      onChange={(e) => setSignerName(e.target.value)}
+                                      className="sign-input"
+                                      placeholder="Enter your full name"
+                                      required
+                                    />
+                                    <label className="sign-label">Form Notes (Optional)</label>
+                                    <textarea
+                                      value={signNotes}
+                                      onChange={(e) => setSignNotes(e.target.value)}
+                                      rows={3}
+                                      className="sign-textarea"
+                                      placeholder="Any additional information about the form..."
+                                    />
+                                  </>
+                                ) : (
+                                  <>
+                                    <label className="sign-label">Your Full Name *</label>
+                                    <input
+                                      type="text"
+                                      value={signerName}
+                                      onChange={(e) => setSignerName(e.target.value)}
+                                      className="sign-input"
+                                      placeholder="Enter your full name"
+                                      required
+                                    />
+                                  </>
+                                )}
+                              </div>
+                                                               <div className="sign-col">
+                                  <label className="sign-label">Confirmation</label>
+                                  <label className="sign-check">
+                                    <input
+                                      type="checkbox"
+                                      checked={hasReviewedConfirm}
+                                      onChange={(e) => setHasReviewedConfirm(e.target.checked)}
+                                      className="sign-checkbox"
+                                    />
+                                    <span>
+                                      {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') 
+                                        ? 'I have completed the form accurately and truthfully'
+                                        : 'I have reviewed and understood the document'
+                                      }
+                                    </span>
+                                  </label>
+                                  <label className="sign-label">
+                                    {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT')
+                                      ? 'Attach completed form file *'
+                                      : 'Attach signed file (optional)'
+                                    }
+                                  </label>
+                                  <input
+                                    type="file"
+                                    accept=".pdf,.doc,.docx"
+                                    onChange={(e) => setSignedFile(e.target.files?.[0] || null)}
+                                    className="sign-input"
+                                    required={isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT')}
+                                  />
+                                </div>
+                               <div className="sign-col">
+                                 <label className="sign-label">Additional Notes (Optional)</label>
+                                 <textarea
+                                   value={signNotes}
+                                   onChange={(e) => setSignNotes(e.target.value)}
+                                   rows={3}
+                                   className="sign-textarea"
+                                   placeholder="Any additional comments..."
+                                 />
+                               </div>
+                               <div className="sign-actions">
+                                 <button
+                                   type="button"
+                                   onClick={() => toggleSignSection(document.documentId)}
+                                   className="zforms__button zforms__button--secondary"
+                                 >
+                                   Cancel
+                                 </button>
+                                                                 <button
+                                  type="submit"
+                                  className="zforms__button zforms__button--success"
+                                  disabled={!signerName || !hasReviewedConfirm || (isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') && !signedFile)}
+                                >
+                                  {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') ? 'Submit Form' : 'Send Document'}
+                                </button>
+                               </div>
+                             </form>
+                           </div>
+                         </div>
+                       </div>
+                     )}
+                   </div>
+                 ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Sign Document Modal */}
-      {showSignModal && selectedDocument && (
-        <SignDocumentModal
-          document={selectedDocument}
-          onSign={handleSignDocument}
-          onClose={() => {
-            setShowSignModal(false);
-            setSelectedDocument(null);
-          }}
-        />
-      )}
-
-
+      {/* Inline sign section replaces modal for front office */}
     </div>
   );
 };
-
-// Sign Document Modal Component
-interface SignDocumentModalProps {
-  document: UmbrellaAgreement;
-  onSign: (signerName: string, hasReviewed: boolean, notes?: string) => void;
-  onClose: () => void;
-}
-
-const SignDocumentModal: React.FC<SignDocumentModalProps> = ({ document, onSign, onClose }) => {
-  const [signerName, setSignerName] = useState('');
-  const [hasReviewed, setHasReviewed] = useState(false);
-  const [notes, setNotes] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!signerName.trim()) {
-      alert('Please enter your name');
-      return;
-    }
-    if (!hasReviewed) {
-      alert('Please confirm that you have reviewed the document');
-      return;
-    }
-    onSign(signerName, hasReviewed, notes || undefined);
-  };
-
-  return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div className="mt-3">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Sign Document</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Your Full Name *
-              </label>
-              <input
-                type="text"
-                value={signerName}
-                onChange={(e) => setSignerName(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your full name"
-                required
-              />
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="hasReviewed"
-                checked={hasReviewed}
-                onChange={(e) => setHasReviewed(e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                required
-              />
-              <label htmlFor="hasReviewed" className="ml-2 block text-sm text-gray-900">
-                I confirm that I have reviewed and understood the document *
-              </label>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Additional Notes (Optional)
-              </label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Any additional comments..."
-              />
-            </div>
-
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700"
-              >
-                Sign Document
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 
 
 export default DocumentManagement;
