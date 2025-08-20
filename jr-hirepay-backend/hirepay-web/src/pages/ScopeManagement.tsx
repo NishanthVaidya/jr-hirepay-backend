@@ -240,295 +240,173 @@ const ScopeManagement: React.FC = () => {
                 </span>
               </div>
               
-              <div className="zforms__table-container">
-                <table className="scope-table" style={{ 
-                  width: '100%', 
-                  tableLayout: 'fixed',
-                  borderCollapse: 'collapse',
-                  borderSpacing: 0,
-                  background: 'white',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                }}>
-                  <thead>
-                    <tr>
-                      <th style={{ 
-                        width: '25%', 
-                        textAlign: 'left',
-                        padding: '12px 16px',
-                        borderBottom: '2px solid #e5e7eb',
-                        fontWeight: 'bold',
-                        fontSize: '12px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        color: '#6b7280',
-                        backgroundColor: '#f9fafb'
-                      }}>Title</th>
-                      <th style={{ 
-                        width: '25%', 
-                        textAlign: 'left',
-                        padding: '12px 16px',
-                        borderBottom: '2px solid #e5e7eb',
-                        fontWeight: 'bold',
-                        fontSize: '12px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        color: '#6b7280',
-                        backgroundColor: '#f9fafb'
-                      }}>Assigned To</th>
-                      <th style={{ 
-                        width: '15%', 
-                        textAlign: 'left',
-                        padding: '12px 16px',
-                        borderBottom: '2px solid #e5e7eb',
-                        fontWeight: 'bold',
-                        fontSize: '12px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        color: '#6b7280',
-                        backgroundColor: '#f9fafb'
-                      }}>Status</th>
-                      <th style={{ 
-                        width: '15%', 
-                        textAlign: 'left',
-                        padding: '12px 16px',
-                        borderBottom: '2px solid #e5e7eb',
-                        fontWeight: 'bold',
-                        fontSize: '12px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        color: '#6b7280',
-                        backgroundColor: '#f9fafb'
-                      }}>Created</th>
-                      <th style={{ 
-                        width: '20%', 
-                        textAlign: 'left',
-                        padding: '12px 16px',
-                        borderBottom: '2px solid #e5e7eb',
-                        fontWeight: 'bold',
-                        fontSize: '12px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        color: '#6b7280',
-                        backgroundColor: '#f9fafb'
-                      }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dashboardData.pendingReviews.map((scope, index) => (
-                      <React.Fragment key={scope.id}>
-                        <tr style={{ 
-                          borderBottom: '1px solid #e5e7eb',
-                          transition: 'background-color 0.2s ease',
-                          backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb'
-                        }}>
-                        <td style={{ 
-                          width: '25%', 
-                          textAlign: 'left',
-                          padding: '12px 16px',
-                          borderBottom: '1px solid #e5e7eb',
-                          color: '#1f2937',
-                          fontSize: '14px'
-                        }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div>
-                              <div style={{ fontWeight: '500', color: '#1f2937' }}>{scope.title}</div>
-                              <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>{scope.description}</div>
-                            </div>
-                            <button
-                              onClick={() => toggleScopeExpansion(scope.id)}
-                              style={{ 
-                                background: 'transparent', 
-                                border: 'none', 
-                                color: '#3b82f6', 
-                                cursor: 'pointer',
-                                fontSize: '12px'
-                              }}
-                            >
-                              {expandedScopeId === scope.id ? '▼' : '▶'}
-                            </button>
+              <div className="zforms__table">
+                <div className="zforms__head" data-columns="5">
+                  <div className="zforms__cell">Title</div>
+                  <div className="zforms__cell">Assigned To</div>
+                  <div className="zforms__cell">Status</div>
+                  <div className="zforms__cell">Created</div>
+                  <div className="zforms__cell">Actions</div>
+                </div>
+                {dashboardData.pendingReviews.map((scope, index) => (
+                  <div key={scope.id}>
+                    <div className={`z-row ${index % 2 === 0 ? 'z-row--even' : 'z-row--odd'}`} data-columns="5">
+                      <div className="zforms__cell" data-label="Title">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium">{scope.title}</div>
+                            <div className="text-sm text-gray-500">{scope.description}</div>
                           </div>
-                        </td>
-                        <td style={{ 
-                          width: '25%', 
-                          textAlign: 'left',
-                          padding: '12px 16px',
-                          borderBottom: '1px solid #e5e7eb',
-                          color: '#1f2937',
-                          fontSize: '14px'
-                        }}>
-                          <div style={{ fontWeight: '500', color: '#1f2937' }}>{scope.assignedTo.fullName}</div>
-                          <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>{scope.assignedTo.email}</div>
-                        </td>
-                        <td style={{ 
-                          width: '15%', 
-                          textAlign: 'left',
-                          padding: '12px 16px',
-                          borderBottom: '1px solid #e5e7eb'
-                        }}>
-                          {getStatusBadge(scope.status)}
-                        </td>
-                        <td style={{ 
-                          width: '15%', 
-                          textAlign: 'left',
-                          padding: '12px 16px',
-                          borderBottom: '1px solid #e5e7eb',
-                          color: '#6b7280',
-                          fontSize: '14px'
-                        }}>
-                          {new Date(scope.createdAt).toLocaleDateString()}
-                        </td>
-                        <td style={{ 
-                          width: '20%', 
-                          textAlign: 'left',
-                          padding: '12px 16px',
-                          borderBottom: '1px solid #e5e7eb'
-                        }}>
                           <button
-                            onClick={() => toggleReviewSection(scope.id)}
-                            className="zforms__button zforms__button--primary"
-                            style={{ marginRight: '8px' }}
+                            onClick={() => toggleScopeExpansion(scope.id)}
+                            className="text-blue-600 hover:text-blue-800"
                           >
-                            {expandedReviewId === scope.id ? 'Hide Review' : 'Review'}
+                            {expandedScopeId === scope.id ? '▼' : '▶'}
                           </button>
-                        </td>
-                        </tr>
-                        {expandedScopeId === scope.id && (
-                          <tr>
-                            <td colSpan={5}>
-                              {renderScopeDetails(scope)}
-                            </td>
-                          </tr>
-                        )}
-                        
-                        {/* Collapsible Review Section */}
-                        {expandedReviewId === scope.id && (
-                          <tr>
-                            <td colSpan={5}>
-                              <div className="z-row z-row--review-expanded">
-                                <div className="zforms__cell zforms__review-section" style={{ gridColumn: '1 / -1' }}>
-                                  <div className="zforms__review-content">
-                                    <h4 className="zforms__review-title">Review Scope</h4>
-                                    
-                                    <div className="zforms__review-info">
-                                      <div className="zforms__review-info-item">
-                                        <strong>Assigned to:</strong> {scope.assignedTo.fullName} ({scope.assignedTo.email})
-                                      </div>
-                                      <div className="zforms__review-info-item">
-                                        <strong>Created:</strong> {new Date(scope.createdAt).toLocaleDateString()}
-                                      </div>
-                                      <div className="zforms__review-info-item">
-                                        <strong>Template:</strong> {scope.template || 'Not specified'}
-                                      </div>
-                                      <div className="zforms__review-info-item">
-                                        <strong>Timeline:</strong> {scope.timeline || 'Not specified'}
-                                      </div>
-                                      {scope.objectives && (
-                                        <div className="zforms__review-info-item">
-                                          <strong>Objectives:</strong> {scope.objectives}
-                                        </div>
-                                      )}
-                                      {scope.deliverables && (
-                                        <div className="zforms__review-info-item">
-                                          <strong>Deliverables:</strong> {scope.deliverables}
-                                        </div>
-                                      )}
-                                      {scope.requirements && (
-                                        <div className="zforms__review-info-item">
-                                          <strong>Requirements:</strong> {scope.requirements}
-                                        </div>
-                                      )}
-                                      {scope.constraints && (
-                                        <div className="zforms__review-info-item">
-                                          <strong>Constraints:</strong> {scope.constraints}
-                                        </div>
-                                      )}
-                                    </div>
-                                    
-                                    <form onSubmit={(e) => {
-                                      e.preventDefault();
-                                      handleInlineReview(scope);
-                                    }} className="zforms__review-form">
-                                      <div className="zforms__review-decision">
-                                        <label className="zforms__review-label">Review Decision</label>
-                                        <div className="zforms__review-radio-group">
-                                          <label className="zforms__review-radio">
-                                            <input
-                                              type="radio"
-                                              value="approve"
-                                              checked={reviewDecision === 'approve'}
-                                              onChange={() => setReviewDecision('approve')}
-                                              className="zforms__radio-input"
-                                            />
-                                            <span className="zforms__radio-label">Approve</span>
-                                          </label>
-                                          <label className="zforms__review-radio">
-                                            <input
-                                              type="radio"
-                                              value="reject"
-                                              checked={reviewDecision === 'reject'}
-                                              onChange={() => setReviewDecision('reject')}
-                                              className="zforms__radio-input"
-                                            />
-                                            <span className="zforms__radio-label">Reject</span>
-                                          </label>
-                                          <label className="zforms__review-radio">
-                                            <input
-                                              type="radio"
-                                              value="request_changes"
-                                              checked={reviewDecision === 'request_changes'}
-                                              onChange={() => setReviewDecision('request_changes')}
-                                              className="zforms__radio-input"
-                                            />
-                                            <span className="zforms__radio-label">Request Changes</span>
-                                          </label>
-                                        </div>
-                                      </div>
-
-                                      <div className="zforms__review-notes">
-                                        <label className="zforms__review-label">Review Notes (Optional)</label>
-                                        <textarea
-                                          value={reviewNotes}
-                                          onChange={(e) => setReviewNotes(e.target.value)}
-                                          rows={3}
-                                          className="zforms__review-textarea"
-                                          placeholder="Add review comments..."
-                                        />
-                                      </div>
-
-                                      <div className="zforms__review-actions">
-                                        <button
-                                          type="button"
-                                          onClick={() => toggleReviewSection(scope.id)}
-                                          className="zforms__button zforms__button--secondary"
-                                        >
-                                          Cancel
-                                        </button>
-                                        <button
-                                          type="submit"
-                                          className={`zforms__button ${
-                                            reviewDecision === 'approve' 
-                                              ? 'zforms__button--success' 
-                                              : reviewDecision === 'reject'
-                                                ? 'zforms__button--danger'
-                                                : 'zforms__button--warning'
-                                          }`}
-                                        >
-                                          {reviewDecision === 'approve' ? 'Approve' : reviewDecision === 'reject' ? 'Reject' : 'Request Changes'} Scope
-                                        </button>
-                                      </div>
-                                    </form>
-                                  </div>
+                        </div>
+                      </div>
+                      <div className="zforms__cell" data-label="Assigned To">
+                        <div className="font-medium">{scope.assignedTo.fullName}</div>
+                        <div className="text-sm text-gray-500">{scope.assignedTo.email}</div>
+                      </div>
+                      <div className="zforms__cell" data-label="Status">
+                        {getStatusBadge(scope.status)}
+                      </div>
+                      <div className="zforms__cell" data-label="Created">
+                        {new Date(scope.createdAt).toLocaleDateString()}
+                      </div>
+                      <div className="zforms__cell" data-label="Actions">
+                        <button
+                          onClick={() => toggleReviewSection(scope.id)}
+                          className="zforms__button zforms__button--primary"
+                        >
+                          {expandedReviewId === scope.id ? 'Hide Review' : 'Review'}
+                        </button>
+                      </div>
+                    </div>
+                    {expandedScopeId === scope.id && renderScopeDetails(scope)}
+                    
+                    {/* Collapsible Review Section */}
+                    {expandedReviewId === scope.id && (
+                      <div className="z-row z-row--review-expanded">
+                        <div className="zforms__cell zforms__review-section" style={{ gridColumn: '1 / -1' }}>
+                          <div className="zforms__review-content">
+                            <h4 className="zforms__review-title">Review Scope</h4>
+                            
+                            <div className="zforms__review-info">
+                              <div className="zforms__review-info-item">
+                                <strong>Assigned to:</strong> {scope.assignedTo.fullName} ({scope.assignedTo.email})
+                              </div>
+                              <div className="zforms__review-info-item">
+                                <strong>Created:</strong> {new Date(scope.createdAt).toLocaleDateString()}
+                              </div>
+                              <div className="zforms__review-info-item">
+                                <strong>Template:</strong> {scope.template || 'Not specified'}
+                              </div>
+                              <div className="zforms__review-info-item">
+                                <strong>Timeline:</strong> {scope.timeline || 'Not specified'}
+                              </div>
+                              {scope.objectives && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Objectives:</strong> {scope.objectives}
+                                </div>
+                              )}
+                              {scope.deliverables && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Deliverables:</strong> {scope.deliverables}
+                                </div>
+                              )}
+                              {scope.requirements && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Requirements:</strong> {scope.requirements}
+                                </div>
+                              )}
+                              {scope.constraints && (
+                                <div className="zforms__review-info-item">
+                                  <strong>Constraints:</strong> {scope.constraints}
+                                </div>
+                              )}
+                            </div>
+                            
+                            <form onSubmit={(e) => {
+                              e.preventDefault();
+                              handleInlineReview(scope);
+                            }} className="zforms__review-form">
+                              <div className="zforms__review-decision">
+                                <label className="zforms__review-label">Review Decision</label>
+                                <div className="zforms__review-radio-group">
+                                  <label className="zforms__review-radio">
+                                    <input
+                                      type="radio"
+                                      value="approve"
+                                      checked={reviewDecision === 'approve'}
+                                      onChange={() => setReviewDecision('approve')}
+                                      className="zforms__radio-input"
+                                    />
+                                    <span className="zforms__radio-label">Approve</span>
+                                  </label>
+                                  <label className="zforms__review-radio">
+                                    <input
+                                      type="radio"
+                                      value="reject"
+                                      checked={reviewDecision === 'reject'}
+                                      onChange={() => setReviewDecision('reject')}
+                                      className="zforms__radio-input"
+                                    />
+                                    <span className="zforms__radio-label">Reject</span>
+                                  </label>
+                                  <label className="zforms__review-radio">
+                                    <input
+                                      type="radio"
+                                      value="request_changes"
+                                      checked={reviewDecision === 'request_changes'}
+                                      onChange={() => setReviewDecision('request_changes')}
+                                      className="zforms__radio-input"
+                                    />
+                                    <span className="zforms__radio-label">Request Changes</span>
+                                  </label>
                                 </div>
                               </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </tbody>
-                </table>
+
+                              <div className="zforms__review-notes">
+                                <label className="zforms__review-label">Review Notes (Optional)</label>
+                                <textarea
+                                  value={reviewNotes}
+                                  onChange={(e) => setReviewNotes(e.target.value)}
+                                  rows={3}
+                                  className="zforms__review-textarea"
+                                  placeholder="Add review comments..."
+                                />
+                              </div>
+
+                              <div className="zforms__review-actions">
+                                <button
+                                  type="button"
+                                  onClick={() => toggleReviewSection(scope.id)}
+                                  className="zforms__button zforms__button--secondary"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="submit"
+                                  className={`zforms__button ${
+                                    reviewDecision === 'approve' 
+                                      ? 'zforms__button--success' 
+                                      : reviewDecision === 'reject'
+                                        ? 'zforms__button--danger'
+                                        : 'zforms__button--warning'
+                                  }`}
+                                >
+                                  {reviewDecision === 'approve' ? 'Approve' : reviewDecision === 'reject' ? 'Reject' : 'Request Changes'} Scope
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
