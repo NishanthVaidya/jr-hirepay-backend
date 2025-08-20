@@ -188,7 +188,6 @@ const ApprovedDocumentsBrowser: React.FC<ApprovedDocumentsBrowserProps> = ({
                           <div className={styles.docHeaderCell}>Status</div>
                           <div className={styles.docHeaderCell}>Updated On</div>
                           <div className={styles.docHeaderCell}>Save to Drive</div>
-                          <div className={styles.docHeaderCell}>Comments</div>
                         </div>
                         {approvedDocs.map((doc) => (
                           <div key={doc.id} className={styles.documentRow}>
@@ -224,13 +223,7 @@ const ApprovedDocumentsBrowser: React.FC<ApprovedDocumentsBrowserProps> = ({
                                 Save to Drive
                               </button>
                             </div>
-                            <div className={styles.docCell}>
-                              {doc.notes && (
-                                <span className={styles.docNote} title={doc.notes}>
-                                  {doc.notes}
-                                </span>
-                              )}
-                            </div>
+
                           </div>
                         ))}
                       </div>
