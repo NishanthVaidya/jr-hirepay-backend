@@ -12,7 +12,7 @@ const DocumentManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<string>('');
-  const [selectedDocumentType, setSelectedDocumentType] = useState<string>('UMBRELLA_AGREEMENT');
+  const [selectedDocumentType, setSelectedDocumentType] = useState<string>('INVOICE');
   const [notes, setNotes] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [expandedSignId, setExpandedSignId] = useState<string | null>(null);
@@ -27,18 +27,24 @@ const DocumentManagement: React.FC = () => {
   const isBackOffice = currentUser?.roles.includes('BACK_OFFICE') || currentUser?.roles.includes('ADMIN');
   const isAdmin = currentUser?.roles.includes('ADMIN');
 
-  // Document type options
-  const documentTypes = [
+  // Document type options - role-based filtering
+  const frontOfficeDocumentTypes = [
+    { value: 'INVOICE', label: 'Invoice' },
+    { value: 'DELIVERABLES_PROOF', label: 'Deliverables Proof' }
+  ];
+
+  const backOfficeDocumentTypes = [
     { value: 'UMBRELLA_AGREEMENT', label: 'Umbrella Agreement' },
     { value: 'TAX_FORM_W9', label: 'Tax Form W-9' },
     { value: 'TAX_FORM_W8BEN', label: 'Tax Form W-8BEN' },
     { value: 'PAYMENT_AUTH_FORM', label: 'Payment Authorization Form' },
     { value: 'TASK_ORDER', label: 'Task Order' },
     { value: 'AGREEMENT_MODIFICATION', label: 'Agreement Modification' },
-    { value: 'TASK_ORDER_MODIFICATION', label: 'Task Order Modification' },
-    { value: 'INVOICE', label: 'Invoice' },
-    { value: 'DELIVERABLES_PROOF', label: 'Deliverables Proof' }
+    { value: 'TASK_ORDER_MODIFICATION', label: 'Task Order Modification' }
   ];
+
+  // Use appropriate document types based on user role
+  const documentTypes = isBackOffice ? backOfficeDocumentTypes : frontOfficeDocumentTypes;
 
   const loadData = useCallback(async () => {
     try {
@@ -87,7 +93,7 @@ const DocumentManagement: React.FC = () => {
   };
 
   const handleSendDocument = async () => {
-    if (!selectedUser) {
+    if (isBackOffice && !selectedUser) {
       setError('Please select a user');
       return;
     }
@@ -98,21 +104,21 @@ const DocumentManagement: React.FC = () => {
 
     try {
       await umbrellaAgreementService.sendAgreement({
-        frontOfficeUserId: selectedUser,
+        frontOfficeUserId: isBackOffice ? selectedUser : String(currentUser?.id || ''),
         notes: notes || undefined,
         document: selectedFile,
         documentType: selectedDocumentType
       });
       
       setSelectedUser('');
-      setSelectedDocumentType('UMBRELLA_AGREEMENT');
+      setSelectedDocumentType(isBackOffice ? 'UMBRELLA_AGREEMENT' : 'INVOICE');
       setNotes('');
       setSelectedFile(null);
       setError(null);
       loadData(); // Refresh data
-      alert('Document sent successfully!');
+      alert(isBackOffice ? 'Document sent successfully!' : 'Work submitted successfully!');
     } catch (err) {
-      setError('Failed to send document');
+      setError(isBackOffice ? 'Failed to send document' : 'Failed to submit work');
       console.error(err);
     }
   };
@@ -304,8 +310,8 @@ const DocumentManagement: React.FC = () => {
           </div>
         )}
 
-        {/* Back Office Section - Send Documents */}
-        {isBackOffice && (
+        {/* Document Submission Section - Role Based */}
+        {(isBackOffice || !isBackOffice) && (
           <div className="zforms mb-8">
             <div className="zforms__section">
               <div className="zforms__header">
@@ -313,14 +319,14 @@ const DocumentManagement: React.FC = () => {
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  Send Document
+                  {isBackOffice ? 'Send Document' : 'Submit Work'}
                 </div>
                 <span className="zforms__badge">
-                  {frontOfficeUsers.length} users
+                  {isBackOffice ? `${frontOfficeUsers.length} users` : 'Submit to Back Office'}
                 </span>
               </div>
               
-              {frontOfficeUsers.length === 0 ? (
+              {isBackOffice && frontOfficeUsers.length === 0 ? (
                 <div className="zforms__empty">
                   <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
@@ -333,27 +339,29 @@ const DocumentManagement: React.FC = () => {
               ) : (
                 <div className="zforms__content">
                   <div className="zforms__form-grid">
-                    <div className="zforms__form-field">
-                      <label className="zforms__form-label">
-                        Select Front Office User
-                      </label>
-                      <select
-                        value={selectedUser}
-                        onChange={(e) => setSelectedUser(e.target.value)}
-                        className="zforms__form-input"
-                      >
-                        <option value="">Choose a user...</option>
-                        {frontOfficeUsers.map((user) => (
-                          <option key={user.id} value={user.id}>
-                            {user.designation} - {user.email}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    {isBackOffice && (
+                      <div className="zforms__form-field">
+                        <label className="zforms__form-label">
+                          Select Front Office User
+                        </label>
+                        <select
+                          value={selectedUser}
+                          onChange={(e) => setSelectedUser(e.target.value)}
+                          className="zforms__form-input"
+                        >
+                          <option value="">Choose a user...</option>
+                          {frontOfficeUsers.map((user) => (
+                            <option key={user.id} value={user.id}>
+                              {user.designation} - {user.email}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
 
                     <div className="zforms__form-field">
                       <label className="zforms__form-label">
-                        Document Type
+                        {isBackOffice ? 'Document Type' : 'Work Type'}
                       </label>
                       <select
                         value={selectedDocumentType}
@@ -409,27 +417,27 @@ const DocumentManagement: React.FC = () => {
 
                   <div className="zforms__form-field">
                     <label className="zforms__form-label">
-                      Notes (Optional)
+                      {isBackOffice ? 'Notes (Optional)' : 'Comments (Optional)'}
                     </label>
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       rows={4}
                       className="zforms__form-textarea"
-                      placeholder="Add any notes about this document..."
+                      placeholder={isBackOffice ? "Add any notes about this document..." : "Add any comments about your work..."}
                     />
                   </div>
 
                   <div className="zforms__form-actions">
                     <button
                       onClick={handleSendDocument}
-                      disabled={!selectedUser || !selectedFile}
+                      disabled={isBackOffice ? (!selectedUser || !selectedFile) : !selectedFile}
                       className="zforms__button zforms__button--primary"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                       </svg>
-                      Send Document
+                      {isBackOffice ? 'Send Document' : 'Submit Work'}
                     </button>
                   </div>
                 </div>
