@@ -30,6 +30,25 @@ public class UmbrellaAgreementDTOs {
         public void setDocumentType(String documentType) { this.documentType = documentType; }
     }
 
+    public static class SubmitWorkRequest {
+        private String notes;
+        private MultipartFile document;
+        private String documentType;
+
+        public SubmitWorkRequest(String notes, MultipartFile document, String documentType) {
+            this.notes = notes;
+            this.document = document;
+            this.documentType = documentType;
+        }
+
+        public String getNotes() { return notes; }
+        public void setNotes(String notes) { this.notes = notes; }
+        public MultipartFile getDocument() { return document; }
+        public void setDocument(MultipartFile document) { this.document = document; }
+        public String getDocumentType() { return documentType; }
+        public void setDocumentType(String documentType) { this.documentType = documentType; }
+    }
+
     public static class SignAgreementRequest {
         @NotBlank
         private String documentId;

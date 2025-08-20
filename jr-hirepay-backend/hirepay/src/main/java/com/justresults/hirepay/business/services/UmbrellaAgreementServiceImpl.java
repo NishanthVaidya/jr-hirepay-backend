@@ -99,6 +99,53 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
     }
 
     @Override
+    public UmbrellaAgreementResponse submitWork(String submittedBy, SubmitWorkRequest request) throws IOException {
+        // Get the front office user who is submitting the work
+        User frontOfficeUser = userRepository.findByEmail(submittedBy)
+            .orElseThrow(() -> new NotFoundException("Front office user not found"));
+
+        // Create a new procedure for this work submission
+        Procedure procedure = new Procedure();
+        procedure.setProduct(com.justresults.hirepay.enumeration.ProductType.HIRING);
+        procedure.setConsultantEmail(frontOfficeUser.getEmail());
+        procedure.setConsultantName(frontOfficeUser.getDesignation());
+        procedure.setStatus(com.justresults.hirepay.enumeration.ProcedureStatus.DRAFT);
+        procedure = procedureRepository.save(procedure);
+
+        // Handle document upload
+        if (request.getDocument() == null || request.getDocument().isEmpty()) {
+            throw new InvalidStateException("Document is required for work submission");
+        }
+
+        byte[] workContent = request.getDocument().getBytes();
+        String filename = request.getDocument().getOriginalFilename();
+
+        // Store the document
+        String location = documentStorageService.store(procedure.getUuid(), workContent, filename);
+
+        // Determine document reference based on document type
+        DocReference docReference = determineDocReference(request.getDocumentType());
+
+        // Create document record - set status directly to SUBMITTED for work submissions
+        ProcedureDocument document = new ProcedureDocument();
+        document.setProcedure(procedure);
+        document.setDocReference(docReference);
+        document.setLocation(location);
+        document.setActorEmail(submittedBy);
+        document.setStatus(DocumentStatus.SUBMITTED); // Directly submitted for review
+        document.setNotes(request.getNotes());
+        document.setVersion(1);
+
+        ProcedureDocument savedDocument = documentRepository.save(document);
+
+        // Update procedure status
+        procedure.setStatus(com.justresults.hirepay.enumeration.ProcedureStatus.AGREEMENT_SUBMITTED);
+        procedureRepository.save(procedure);
+
+        return createUmbrellaAgreementResponse(savedDocument, frontOfficeUser, submittedBy, filename);
+    }
+
+    @Override
     public UmbrellaAgreementResponse signAgreement(String signerEmail, SignAgreementRequest request, MultipartFile signedDocument) throws IOException {
         // Get the document
         ProcedureDocument document = documentRepository.findById(Long.valueOf(request.getDocumentId()))
@@ -293,6 +340,17 @@ public class UmbrellaAgreementServiceImpl implements UmbrellaAgreementService {
     public List<UmbrellaAgreementResponse> getPendingReviewAgreements() {
         List<ProcedureDocument> documents = documentRepository.findByStatusInOrderByCreatedAtDesc(
             Arrays.asList(DocumentStatus.SIGNED, DocumentStatus.SUBMITTED)
+        );
+
+        return documents.stream()
+            .map(this::createUmbrellaAgreementResponseFromDocument)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UmbrellaAgreementResponse> getAllApprovedDocuments() {
+        List<ProcedureDocument> documents = documentRepository.findByStatusInOrderByCreatedAtDesc(
+            Arrays.asList(DocumentStatus.SIGNED, DocumentStatus.APPROVED, DocumentStatus.SUBMITTED)
         );
 
         return documents.stream()

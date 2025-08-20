@@ -69,6 +69,42 @@ public class UmbrellaAgreementController {
         }
     }
 
+    // Submit work (invoice/deliverables) from front office to back office for review
+    @PostMapping(value = "/submit-work", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UmbrellaAgreementResponse> submitWork(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam(value = "notes", required = false) String notes,
+            @RequestParam(value = "document", required = false) MultipartFile document,
+            @RequestParam(value = "documentType", required = false) String documentType) throws IOException {
+        
+        try {
+            // Validate required fields
+            if (document == null || document.isEmpty()) {
+                throw new IllegalArgumentException("document is required");
+            }
+            
+            String submittedBy = extractEmailFromAuthHeader(authHeader);
+            
+            System.out.println("Submitting work - submittedBy: " + submittedBy);
+            System.out.println("notes: " + notes);
+            System.out.println("documentType: " + documentType);
+            System.out.println("document: " + (document != null ? document.getOriginalFilename() : "null"));
+            
+            SubmitWorkRequest request = new SubmitWorkRequest(
+                notes, 
+                document,
+                documentType
+            );
+            
+            UmbrellaAgreementResponse response = umbrellaAgreementService.submitWork(submittedBy, request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("Error submitting work: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
     // Sign agreement (front office user) - supports optional signed file upload
     @PostMapping(value = "/sign", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UmbrellaAgreementResponse> signAgreement(
@@ -162,6 +198,13 @@ public class UmbrellaAgreementController {
     @GetMapping("/pending-review")
     public ResponseEntity<List<UmbrellaAgreementResponse>> getPendingReviewAgreements() {
         List<UmbrellaAgreementResponse> agreements = umbrellaAgreementService.getPendingReviewAgreements();
+        return ResponseEntity.ok(agreements);
+    }
+
+    // Get all approved documents (back office only)
+    @GetMapping("/approved-documents")
+    public ResponseEntity<List<UmbrellaAgreementResponse>> getAllApprovedDocuments() {
+        List<UmbrellaAgreementResponse> agreements = umbrellaAgreementService.getAllApprovedDocuments();
         return ResponseEntity.ok(agreements);
     }
 

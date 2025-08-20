@@ -33,6 +33,12 @@ export interface SendUmbrellaAgreementRequest {
   documentType?: string;
 }
 
+export interface SubmitWorkRequest {
+  notes?: string;
+  document?: File;
+  documentType?: string;
+}
+
 export interface SignAgreementRequest {
   documentId: string;
   signerName: string;
@@ -76,6 +82,23 @@ export const umbrellaAgreementService = {
     return response.data;
   },
 
+  // Submit work (invoice/deliverables) from front office to back office
+  submitWork: async (request: SubmitWorkRequest): Promise<UmbrellaAgreement> => {
+    const formData = new FormData();
+    if (request.notes) {
+      formData.append('notes', request.notes);
+    }
+    if (request.document) {
+      formData.append('document', request.document);
+    }
+    if (request.documentType) {
+      formData.append('documentType', request.documentType);
+    }
+
+    const response = await api.post('/api/umbrella-agreements/submit-work', formData);
+    return response.data;
+  },
+
   // Sign an agreement (optionally uploading a signed document)
   signAgreement: async (request: SignAgreementRequest & { signedDocument?: File }): Promise<UmbrellaAgreement> => {
     const formData = new FormData();
@@ -115,6 +138,12 @@ export const umbrellaAgreementService = {
   // Get pending review agreements
   getPendingReviewAgreements: async (): Promise<UmbrellaAgreement[]> => {
     const response = await api.get('/api/umbrella-agreements/pending-review');
+    return response.data;
+  },
+
+  // Get all approved documents
+  getAllApprovedDocuments: async (): Promise<UmbrellaAgreement[]> => {
+    const response = await api.get('/api/umbrella-agreements/approved-documents');
     return response.data;
   },
 

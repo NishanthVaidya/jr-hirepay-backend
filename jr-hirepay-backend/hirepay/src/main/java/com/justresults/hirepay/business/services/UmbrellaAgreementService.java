@@ -13,6 +13,11 @@ public interface UmbrellaAgreementService {
     UmbrellaAgreementResponse sendAgreement(String sentBy, SendUmbrellaAgreementRequest request) throws IOException;
 
     /**
+     * Submit work (invoice/deliverables) from front office to back office for review
+     */
+    UmbrellaAgreementResponse submitWork(String submittedBy, SubmitWorkRequest request) throws IOException;
+
+    /**
      * Sign the umbrella agreement (front office user)
      */
     UmbrellaAgreementResponse signAgreement(String signerEmail, SignAgreementRequest request, org.springframework.web.multipart.MultipartFile signedDocument) throws IOException;
@@ -46,4 +51,9 @@ public interface UmbrellaAgreementService {
      * Get pending agreements for back office review
      */
     List<UmbrellaAgreementResponse> getPendingReviewAgreements();
+
+    /**
+     * Get all approved documents for the approved documents browser
+     */
+    List<UmbrellaAgreementResponse> getAllApprovedDocuments();
 }

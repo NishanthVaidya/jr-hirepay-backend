@@ -9,6 +9,7 @@ const DocumentManagement: React.FC = () => {
   const [frontOfficeUsers, setFrontOfficeUsers] = useState<FrontOfficeUser[]>([]);
   const [myDocuments, setMyDocuments] = useState<UmbrellaAgreement[]>([]);
   const [pendingReviews, setPendingReviews] = useState<UmbrellaAgreement[]>([]);
+  const [allApprovedDocuments, setAllApprovedDocuments] = useState<UmbrellaAgreement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<string>('');
@@ -58,8 +59,12 @@ const DocumentManagement: React.FC = () => {
       setMyDocuments(documents);
 
       if (isBackOffice) {
-        const reviews = await umbrellaAgreementService.getPendingReviewAgreements();
+        const [reviews, approvedDocs] = await Promise.all([
+          umbrellaAgreementService.getPendingReviewAgreements(),
+          umbrellaAgreementService.getAllApprovedDocuments()
+        ]);
         setPendingReviews(reviews);
+        setAllApprovedDocuments(approvedDocs);
       }
     } catch (err) {
       setError('Failed to load data');
@@ -103,12 +108,22 @@ const DocumentManagement: React.FC = () => {
     }
 
     try {
-      await umbrellaAgreementService.sendAgreement({
-        frontOfficeUserId: isBackOffice ? selectedUser : String(currentUser?.id || ''),
-        notes: notes || undefined,
-        document: selectedFile,
-        documentType: selectedDocumentType
-      });
+      if (isBackOffice) {
+        // Back office: send agreement to front office user
+        await umbrellaAgreementService.sendAgreement({
+          frontOfficeUserId: selectedUser,
+          notes: notes || undefined,
+          document: selectedFile,
+          documentType: selectedDocumentType
+        });
+      } else {
+        // Front office: submit work directly to back office for review
+        await umbrellaAgreementService.submitWork({
+          notes: notes || undefined,
+          document: selectedFile,
+          documentType: selectedDocumentType
+        });
+      }
       
       setSelectedUser('');
       setSelectedDocumentType(isBackOffice ? 'UMBRELLA_AGREEMENT' : 'INVOICE');
@@ -615,7 +630,7 @@ const DocumentManagement: React.FC = () => {
                   Approved Documents
                 </div>
                 <span className="zforms__badge">
-                  {transformToApprovedDocumentsBrowser(myDocuments, frontOfficeUsers).length} users
+                  {transformToApprovedDocumentsBrowser(allApprovedDocuments, frontOfficeUsers).length} users
                 </span>
               </div>
               
@@ -625,7 +640,7 @@ const DocumentManagement: React.FC = () => {
               </p>
               
               <ApprovedDocumentsBrowser
-                users={transformToApprovedDocumentsBrowser(myDocuments, frontOfficeUsers)}
+                users={transformToApprovedDocumentsBrowser(allApprovedDocuments, frontOfficeUsers)}
                 pageSize={20}
                 onViewDocument={(doc, user) => {
                   if (doc.viewUrl) {
