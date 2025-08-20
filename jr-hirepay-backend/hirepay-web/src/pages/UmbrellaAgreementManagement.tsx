@@ -306,7 +306,7 @@ const DocumentManagement: React.FC = () => {
 
         {/* Back Office Section - Send Documents */}
         {isBackOffice && (
-          <div className="zforms">
+          <div className="zforms mb-8">
             <div className="zforms__section">
               <div className="zforms__header">
                 <div className="zforms__title">
@@ -440,7 +440,7 @@ const DocumentManagement: React.FC = () => {
 
         {/* Pending Reviews Section - Back Office Only */}
         {isBackOffice && pendingReviews.length > 0 && (
-          <div className="zforms">
+          <div className="zforms mb-8">
             <div className="zforms__section">
               <div className="zforms__header">
                 <div className="zforms__title">
@@ -597,7 +597,7 @@ const DocumentManagement: React.FC = () => {
         {/* Documents Section - role specific */}
         {isBackOffice ? (
           // Back office: show Approved Documents Browser
-          <div className="zforms">
+          <div className="zforms mb-8">
             <div className="zforms__section">
               <div className="zforms__header">
                 <div className="zforms__title">
@@ -633,7 +633,7 @@ const DocumentManagement: React.FC = () => {
           </div>
         ) : (
           // Front office: show My Documents list with actions and comments
-          <div className="zforms">
+          <div className="zforms mb-8">
             <div className="zforms__section">
               <div className="zforms__header">
                 <div className="zforms__title">
