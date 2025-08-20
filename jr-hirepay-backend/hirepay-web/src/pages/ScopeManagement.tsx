@@ -368,17 +368,6 @@ const ScopeManagement: React.FC = () => {
                                 </div>
                               </div>
 
-                              <div className="zforms__review-notes">
-                                <label className="zforms__review-label">Review Notes (Optional)</label>
-                                <textarea
-                                  value={reviewNotes}
-                                  onChange={(e) => setReviewNotes(e.target.value)}
-                                  rows={3}
-                                  className="zforms__review-textarea"
-                                  placeholder="Add review comments..."
-                                />
-                              </div>
-
                               <div className="zforms__review-actions">
                                 <button
                                   type="button"
@@ -556,17 +545,6 @@ const ScopeManagement: React.FC = () => {
                                     <span className="zforms__radio-label">Request Changes</span>
                                   </label>
                                 </div>
-                              </div>
-
-                              <div className="zforms__review-notes">
-                                <label className="zforms__review-label">Review Notes (Optional)</label>
-                                <textarea
-                                  value={reviewNotes}
-                                  onChange={(e) => setReviewNotes(e.target.value)}
-                                  rows={3}
-                                  className="zforms__review-textarea"
-                                  placeholder="Add review comments..."
-                                />
                               </div>
 
                               <div className="zforms__review-actions">

@@ -501,13 +501,7 @@ const DocumentManagement: React.FC = () => {
                         >
                           {expandedReviewId === document.documentId ? 'Hide Review' : 'Review'}
                         </button>
-                        <button
-                          onClick={() => handleSaveToGoogleDrive(document.documentId, document.documentName || 'document.pdf')}
-                          className="zforms__button zforms__button--secondary"
-                          title="Save to Google Drive"
-                        >
-                          Save to Drive
-                        </button>
+
                         {document.notes && (
                           <div className="zforms__comment" title={document.notes}>
                             {document.notes}
@@ -853,7 +847,7 @@ const DocumentManagement: React.FC = () => {
                                  </button>
                                  <button
                                    type="submit"
-                                   className="zforms__button zforms__b"
+                                   className="zforms__button zforms__button--success"
                                    disabled={!signerName || !hasReviewedConfirm || (isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') && !signedFile)}
                                  >
                                    {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') ? 'Submit Form' : 'Send Document'}
