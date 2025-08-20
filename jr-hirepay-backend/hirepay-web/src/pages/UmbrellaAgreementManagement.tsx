@@ -648,7 +648,7 @@ const DocumentManagement: React.FC = () => {
               </div>
 
               <div className="zforms__table">
-                <div className="zforms__head">
+                <div className="zforms__head" data-columns="5">
                   <div className="zforms__cell">Document Type</div>
                   <div className="zforms__cell">From</div>
                   <div className="zforms__cell">Status</div>
@@ -658,7 +658,7 @@ const DocumentManagement: React.FC = () => {
                 {myDocuments
                   .filter(doc => doc.frontOfficeUserEmail === currentUser?.email)
                   .map((document, index) => (
-                  <div key={document.documentId} className={`z-row ${index % 2 === 0 ? 'z-row--even' : 'z-row--odd'}`}>
+                  <div key={document.documentId} className={`z-row ${index % 2 === 0 ? 'z-row--even' : 'z-row--odd'}`} data-columns="5">
                     <div className="zforms__cell zforms__file" data-label="Document Type">
                       <div className="z-icon">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

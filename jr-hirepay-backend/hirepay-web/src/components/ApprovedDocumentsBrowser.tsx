@@ -187,7 +187,8 @@ const ApprovedDocumentsBrowser: React.FC<ApprovedDocumentsBrowserProps> = ({
                           <div className={styles.docHeaderCell}>Type</div>
                           <div className={styles.docHeaderCell}>Status</div>
                           <div className={styles.docHeaderCell}>Updated On</div>
-                          <div className={styles.docHeaderCell}>Actions</div>
+                          <div className={styles.docHeaderCell}>Save to Drive</div>
+                          <div className={styles.docHeaderCell}>Comments</div>
                         </div>
                         {approvedDocs.map((doc) => (
                           <div key={doc.id} className={styles.documentRow}>
@@ -212,23 +213,23 @@ const ApprovedDocumentsBrowser: React.FC<ApprovedDocumentsBrowserProps> = ({
                               </span>
                             </div>
                             <div className={styles.docCell}>
-                              <div className={styles.docActions}>
-                                <button
-                                  onClick={() => handleSaveToGoogleDrive(doc, user)}
-                                  className={styles.actionButton}
-                                  title="Save to Google Drive"
-                                >
-                                  <svg className={styles.actionIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-                                  </svg>
-                                  Save to Drive
-                                </button>
-                                {doc.notes && (
-                                  <span className={styles.docNote} title={doc.notes}>
-                                    {doc.notes}
-                                  </span>
-                                )}
-                              </div>
+                              <button
+                                onClick={() => handleSaveToGoogleDrive(doc, user)}
+                                className={styles.actionButton}
+                                title="Save to Google Drive"
+                              >
+                                <svg className={styles.actionIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                                </svg>
+                                Save to Drive
+                              </button>
+                            </div>
+                            <div className={styles.docCell}>
+                              {doc.notes && (
+                                <span className={styles.docNote} title={doc.notes}>
+                                  {doc.notes}
+                                </span>
+                              )}
                             </div>
                           </div>
                         ))}
