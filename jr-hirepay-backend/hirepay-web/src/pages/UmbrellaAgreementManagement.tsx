@@ -294,9 +294,6 @@ const DocumentManagement: React.FC = () => {
           </div>
           <div>
             <h1 className="zform-dashboard-title">Document Management</h1>
-            <p className="zform-dashboard-subtitle">
-              Welcome, {currentUser?.email} ({currentUser?.designation})
-            </p>
           </div>
         </div>
 
@@ -770,72 +767,72 @@ const DocumentManagement: React.FC = () => {
                        <div className="z-row z-row--review-expanded">
                          <div className="zforms__cell zforms__review-section" style={{ gridColumn: '1 / -1' }}>
                            <div className="sign-grid">
-                                                         <form onSubmit={(e) => { e.preventDefault(); handleInlineSign(document); }} className="sign-grid__form">
-                              <div className="sign-card">
-                                {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') ? (
-                                  <>
-                                    <label className="sign-label">Your Full Name *</label>
-                                    <input
-                                      type="text"
-                                      value={signerName}
-                                      onChange={(e) => setSignerName(e.target.value)}
-                                      className="sign-input"
-                                      placeholder="Enter your full name"
-                                      required
-                                    />
-                                    <label className="sign-label">Form Notes (Optional)</label>
-                                    <textarea
-                                      value={signNotes}
-                                      onChange={(e) => setSignNotes(e.target.value)}
-                                      rows={3}
-                                      className="sign-textarea"
-                                      placeholder="Any additional information about the form..."
-                                    />
-                                  </>
-                                ) : (
-                                  <>
-                                    <label className="sign-label">Your Full Name *</label>
-                                    <input
-                                      type="text"
-                                      value={signerName}
-                                      onChange={(e) => setSignerName(e.target.value)}
-                                      className="sign-input"
-                                      placeholder="Enter your full name"
-                                      required
-                                    />
-                                  </>
-                                )}
-                              </div>
-                                                               <div className="sign-col">
-                                  <label className="sign-label">Confirmation</label>
-                                  <label className="sign-check">
-                                    <input
-                                      type="checkbox"
-                                      checked={hasReviewedConfirm}
-                                      onChange={(e) => setHasReviewedConfirm(e.target.checked)}
-                                      className="sign-checkbox"
-                                    />
-                                    <span>
-                                      {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') 
-                                        ? 'I have completed the form accurately and truthfully'
-                                        : 'I have reviewed and understood the document'
-                                      }
-                                    </span>
-                                  </label>
-                                  <label className="sign-label">
-                                    {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT')
-                                      ? 'Attach completed form file *'
-                                      : 'Attach signed file (optional)'
-                                    }
-                                  </label>
-                                  <input
-                                    type="file"
-                                    accept=".pdf,.doc,.docx"
-                                    onChange={(e) => setSignedFile(e.target.files?.[0] || null)}
-                                    className="sign-input"
-                                    required={isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT')}
-                                  />
-                                </div>
+                             <form onSubmit={(e) => { e.preventDefault(); handleInlineSign(document); }} className="sign-grid__form">
+                               <div className="sign-card">
+                                 {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') ? (
+                                   <>
+                                     <label className="sign-label">Your Full Name *</label>
+                                     <input
+                                       type="text"
+                                       value={signerName}
+                                       onChange={(e) => setSignerName(e.target.value)}
+                                       className="sign-input"
+                                       placeholder="Enter your full name"
+                                       required
+                                     />
+                                     <label className="sign-label">Form Notes (Optional)</label>
+                                     <textarea
+                                       value={signNotes}
+                                       onChange={(e) => setSignNotes(e.target.value)}
+                                       rows={3}
+                                       className="sign-textarea"
+                                       placeholder="Any additional information about the form..."
+                                     />
+                                   </>
+                                 ) : (
+                                   <>
+                                     <label className="sign-label">Your Full Name *</label>
+                                     <input
+                                       type="text"
+                                       value={signerName}
+                                       onChange={(e) => setSignerName(e.target.value)}
+                                       className="sign-input"
+                                       placeholder="Enter your full name"
+                                       required
+                                     />
+                                   </>
+                                 )}
+                               </div>
+                               <div className="sign-col">
+                                 <label className="sign-label">Confirmation</label>
+                                 <label className="sign-check">
+                                   <input
+                                     type="checkbox"
+                                     checked={hasReviewedConfirm}
+                                     onChange={(e) => setHasReviewedConfirm(e.target.checked)}
+                                     className="sign-checkbox"
+                                   />
+                                   <span>
+                                     {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') 
+                                       ? 'I have completed the form accurately and truthfully'
+                                       : 'I have reviewed and understood the document'
+                                     }
+                                   </span>
+                                 </label>
+                                 <label className="sign-label">
+                                   {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT')
+                                     ? 'Attach completed form file *'
+                                     : 'Attach signed file (optional)'
+                                   }
+                                 </label>
+                                 <input
+                                   type="file"
+                                   accept=".pdf,.doc,.docx"
+                                   onChange={(e) => setSignedFile(e.target.files?.[0] || null)}
+                                   className="sign-input"
+                                   required={isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT')}
+                                 />
+                               </div>
                                <div className="sign-col">
                                  <label className="sign-label">Additional Notes (Optional)</label>
                                  <textarea
@@ -854,13 +851,13 @@ const DocumentManagement: React.FC = () => {
                                  >
                                    Cancel
                                  </button>
-                                                                 <button
-                                  type="submit"
-                                  className="zforms__button zforms__button--success"
-                                  disabled={!signerName || !hasReviewedConfirm || (isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') && !signedFile)}
-                                >
-                                  {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') ? 'Submit Form' : 'Send Document'}
-                                </button>
+                                 <button
+                                   type="submit"
+                                   className="zforms__button zforms__b"
+                                   disabled={!signerName || !hasReviewedConfirm || (isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') && !signedFile)}
+                                 >
+                                   {isFormSubmission(document.documentType || 'UMBRELLA_AGREEMENT') ? 'Submit Form' : 'Send Document'}
+                                 </button>
                                </div>
                              </form>
                            </div>

@@ -17,23 +17,52 @@
   .send-actions .zforms__button { width: 100%; }
 }
 /* Sign inline grid (standalone, not using zforms structure) */
-.sign-grid { width: 100%; }
+.sign-grid { 
+  width: 100%; 
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  min-width: 100%;
+  max-width: none;
+}
+
 .sign-grid__form {
-  display: grid;
-  grid-template-columns: 320px 1fr 1fr;
-  grid-auto-rows: minmax(0, auto);
-  gap: 24px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background: white;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: none !important;
 }
 
 .sign-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: none;
+  transition: none;
+  width: 100%;
 }
 
-.sign-col { display: flex; flex-direction: column; gap: 12px; }
+.sign-card:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+.sign-col { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  width: 100%;
+}
 .sign-label { font-size: 0.875rem; font-weight: 600; color: var(--text); }
 .sign-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); }
 .sign-input:focus { outline: none; border-color: var(--accent); }
@@ -42,18 +71,44 @@
 .sign-check { display: flex; align-items: center; gap: 8px; color: var(--text); }
 .sign-checkbox { width: 16px; height: 16px; accent-color: var(--accent); }
 
-.sign-actions { display: flex; gap: 12px; justify-content: flex-end; align-items: center; grid-column: 2 / span 2; }
+.sign-actions { 
+  display: flex; 
+  gap: 12px; 
+  justify-content: flex-start; 
+  align-items: center; 
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  width: 100%;
+}
 
 @media (max-width: 1024px) {
-  .sign-grid__form { grid-template-columns: 1fr 1fr; }
-  .sign-card { grid-column: 1 / -1; }
-  .sign-actions { grid-column: 1 / -1; }
+  .sign-grid__form { 
+    gap: 16px;
+    padding: 20px;
+  }
+  .sign-card, .sign-col, .sign-actions { 
+    padding: 16px;
+  }
 }
 
 @media (max-width: 768px) {
-  .sign-grid__form { grid-template-columns: 1fr; }
-  .sign-actions { justify-content: stretch; }
-  .sign-actions .zforms__button { width: 100%; }
+  .sign-grid__form { 
+    gap: 12px;
+    padding: 16px;
+  }
+  .sign-card, .sign-col, .sign-actions { 
+    padding: 12px;
+  }
+  .sign-actions { 
+    justify-content: stretch; 
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sign-actions .zforms__button { 
+    width: 100%; 
+  }
 }
 /* Zform Document Management Styles - Comprehensive Refactor */
 
@@ -475,21 +530,29 @@
 
   .zforms__button--primary {
     background: var(--zforms-accent);
-    color: var(--zforms-text);
+    color: rgb(71, 155, 106);
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(56, 189, 248, 0.3);
   }
 
   .zforms__button--primary:hover {
     background: var(--zforms-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(56, 189, 248, 0.4);
   }
 
   .zforms__button--secondary {
-    background: var(--zforms-surface);
-    color: var(--zforms-text);
-    border: 1px solid var(--zforms-border);
+    background: white;
+    color: #374151;
+    border: 2px solid #e5e7eb;
+    font-weight: 600;
   }
 
   .zforms__button--secondary:hover {
-    background: var(--zforms-border);
+    background: #f9fafb;
+    border-color: #d1d5db;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .zforms__button:disabled {
@@ -962,6 +1025,15 @@
     text-decoration: underline;
   }
   
+  .zforms__comment {
+    font-size: var(--z-font-size-sm);
+    color: var(--zforms-text);
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+  
   .zforms__comment-placeholder {
     font-size: var(--z-font-size-xs);
     color: var(--zforms-muted);
@@ -987,13 +1059,15 @@
   
   .zforms__button--primary {
     background: var(--zforms-accent);
-    color: var(--zforms-bg);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(56, 189, 248, 0.3);
   }
   
   .zforms__button--primary:hover {
     background: var(--zforms-accent-hover);
     transform: translateY(-1px);
-    box-shadow: var(--zforms-shadow);
+    box-shadow: 0 4px 8px rgba(56, 189, 248, 0.4);
   }
   
   .zforms__button--success {
@@ -1009,13 +1083,15 @@
   
   .zforms__button--warning {
     background: var(--zforms-warning);
-    color: var(--zforms-bg);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
   }
   
   .zforms__button--warning:hover {
-    background: var(--zforms-warning);
+    background: #d97706;
     transform: translateY(-1px);
-    box-shadow: var(--zforms-shadow);
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4);
   }
   
   .zforms__button:focus-visible {
@@ -1537,11 +1613,15 @@
   background: var(--surface);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
+  width: 100% !important;
+  grid-column: 1 / -1 !important;
 }
 
 .zforms__review-section {
   padding: 1.5rem;
   background: var(--surface);
+  width: 100% !important;
+  min-width: 100% !important;
 }
 
 .zforms__review-content { max-width: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 24px; align-items: start; }
@@ -1633,7 +1713,7 @@
 
 .zforms__button--success {
   background: var(--success);
-  color: white;
+  color: white(211, 41, 41);
 }
 
 .zforms__button--success:hover {

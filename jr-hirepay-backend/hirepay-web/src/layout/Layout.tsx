@@ -27,7 +27,7 @@ const Layout: React.FC = () => {
                 <div className="zforms__nav-logo-icon" style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #38bdf8, #0ea5e9)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <span className="zforms__nav-logo-text" style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '16px' }}>H</span>
                 </div>
-                <span className="zforms__nav-logo-title" style={{ fontSize: '20px', fontWeight: 'bold', color: '#f1f5f9' }}>HirePay</span>
+                <span className="zforms__nav-logo-title" style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b' }}>HirePay</span>
               </Link>
             </div>
             

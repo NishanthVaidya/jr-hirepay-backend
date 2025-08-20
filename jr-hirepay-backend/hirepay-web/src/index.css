@@ -416,6 +416,9 @@ a:active {
   border: 1px solid var(--gray);
   padding: 1.5rem;
   margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .zform-dashboard-title {
@@ -440,6 +443,7 @@ a:active {
   align-items: center;
   justify-content: center;
   color: var(--white);
+  flex-shrink: 0;
 }
 
 .zform-dashboard-grid {

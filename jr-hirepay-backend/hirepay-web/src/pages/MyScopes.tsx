@@ -13,148 +13,86 @@ const MyScopes: React.FC = () => {
   const [selectedScope, setSelectedScope] = useState<Scope | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [expandedEditId, setExpandedEditId] = useState<number | null>(null);
-  const [expandedScopeId, setExpandedScopeId] = useState<number | null>(null);
+    const [expandedScopeId, setExpandedScopeId] = useState<number | null>(null);
 
-  // Add custom styles for better table layout
+  // Add specific styling for My Scopes table to fix column alignment
   React.useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
-      /* Improved table layout with proper alignment - using !important to override global styles */
+      /* My Scopes table specific styling - 5 columns */
       .zforms .zforms__section .zforms__table {
-        display: grid !important;
-        grid-template-columns: 2fr 1fr 1.5fr 1fr 1.5fr !important;
-        gap: 1rem !important;
-        padding: 1rem !important;
-        background: #f8fafc !important;
-        border-radius: 0.75rem !important;
-        border: 1px solid #e2e8f0 !important;
-        flex-direction: unset !important;
+        display: flex !important;
+        flex-direction: column !important;
         width: 100% !important;
       }
       
       .zforms .zforms__section .zforms__head {
-        display: contents !important;
-        grid-template-columns: unset !important;
-        gap: unset !important;
-        padding: unset !important;
-        background: unset !important;
-        border-bottom: unset !important;
-        position: unset !important;
-        top: unset !important;
-        z-index: unset !important;
-        font-weight: unset !important;
-        font-size: unset !important;
-        text-transform: unset !important;
-        letter-spacing: unset !important;
-        color: unset !important;
-      }
-      
-      .zforms .zforms__section .zforms__head .zforms__cell {
-        background: #1e293b !important;
-        color: #f1f5f9 !important;
-        padding: 1rem !important;
+        display: grid !important;
+        grid-template-columns: 2fr 1fr 1.5fr 1fr 1.5fr !important;
+        gap: 1rem !important;
+        padding: 1rem 2rem !important;
+        background: var(--zforms-surface) !important;
+        border-bottom: 2px solid var(--zforms-border) !important;
         font-weight: 600 !important;
-        text-align: left !important;
-        border-radius: 0.5rem !important;
-        border: 1px solid #334155 !important;
         font-size: 0.75rem !important;
         text-transform: uppercase !important;
         letter-spacing: 0.05em !important;
+        color: var(--zforms-muted) !important;
       }
       
       .zforms .zforms__section .z-row {
-        display: contents !important;
-        grid-template-columns: unset !important;
-        gap: unset !important;
-        padding: unset !important;
-        border-bottom: unset !important;
-        transition: unset !important;
-        min-height: unset !important;
-        align-items: unset !important;
-        background: unset !important;
-      }
-      
-      .zforms .zforms__section .z-row .zforms__cell {
-        background: white !important;
-        padding: 1rem !important;
-        text-align: left !important;
-        border-radius: 0.5rem !important;
-        border: 1px solid #e2e8f0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: flex-start !important;
-        min-height: 80px !important;
+        display: grid !important;
+        grid-template-columns: 2fr 1fr 1.5fr 1fr 1.5fr !important;
+        gap: 1rem !important;
+        padding: 1rem 2rem !important;
+        border-bottom: 1px solid var(--zforms-border) !important;
         transition: all 0.2s ease !important;
-        min-width: unset !important;
+        min-height: 80px !important;
+        align-items: center !important;
+        background: var(--zforms-surface) !important;
       }
       
-      /* Title column - proper left alignment */
+      .zforms .zforms__section .z-row:hover {
+        background: var(--zforms-bg) !important;
+        box-shadow: var(--zforms-shadow) !important;
+        transform: translateY(-1px) !important;
+      }
+      
+      .zforms .zforms__section .zforms__cell {
+        padding: 0.75rem 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        min-width: 0 !important;
+      }
+      
+      /* Title column - left aligned */
       .zforms .zforms__section .zforms__cell[data-label="Title"] {
-        text-align: left !important;
-        align-items: flex-start !important;
         justify-content: flex-start !important;
-      }
-      
-      .zforms .zforms__section .zforms__cell[data-label="Title"] .flex {
-        width: 100% !important;
-        justify-content: space-between !important;
         align-items: flex-start !important;
       }
       
-      /* Status badges - center them within the column */
+      /* Status column - center aligned */
       .zforms .zforms__section .zforms__cell[data-label="Status"] {
         justify-content: center !important;
         align-items: center !important;
-        text-align: center !important;
       }
       
-      .zforms .zforms__section .zforms__cell[data-label="Status"] .zforms__badge--status {
-        margin: 0 auto !important;
-      }
-      
-      /* Assigned By - center the name */
+      /* Assigned By column - center aligned */
       .zforms .zforms__section .zforms__cell[data-label="Assigned By"] {
         justify-content: center !important;
         align-items: center !important;
-        text-align: center !important;
       }
       
-      /* Created date - center it */
+      /* Created column - center aligned */
       .zforms .zforms__section .zforms__cell[data-label="Created"] {
         justify-content: center !important;
         align-items: center !important;
-        text-align: center !important;
-        font-size: 0.875rem !important;
       }
       
-      /* Actions - center the buttons */
+      /* Actions column - center aligned */
       .zforms .zforms__section .zforms__cell[data-label="Actions"] {
         justify-content: center !important;
         align-items: center !important;
-        text-align: center !important;
-        min-width: auto !important;
-      }
-      
-      .zforms .zforms__section .zforms__cell[data-label="Actions"] .flex {
-        justify-content: center !important;
-        gap: 0.5rem !important;
-        flex-wrap: wrap !important;
-        width: 100% !important;
-      }
-      
-      .zforms .zforms__section .zforms__cell[data-label="Actions"] button {
-        white-space: nowrap !important;
-        font-size: 0.75rem !important;
-        padding: 0.5rem 0.75rem !important;
-        margin: 0.25rem !important;
-      }
-      
-      /* Hover effects */
-      .zforms .zforms__section .z-row:hover .zforms__cell {
-        background: #f8fafc !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
       }
       
       /* Expanded row styles */
@@ -162,118 +100,63 @@ const MyScopes: React.FC = () => {
       .zforms .zforms__section .z-row--details-expanded {
         display: contents !important;
         grid-column: 1 / -1 !important;
-        background: #f8fafc !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 0.5rem !important;
+        background: var(--zforms-bg) !important;
+        border: 1px solid var(--zforms-border) !important;
+        border-radius: var(--zforms-radius) !important;
         margin: 0.5rem 0 !important;
       }
       
       .zforms .zforms__section .zforms__edit-section,
       .zforms .zforms__section .zforms__details-section {
         grid-column: 1 / -1 !important;
-        background: #f8fafc !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 0.5rem !important;
-        margin: 0.5rem 0 !important;
-        padding: 1rem !important;
-      }
-      
-      .zforms .zforms__section .zforms__edit-content {
-        background: white !important;
-        border-radius: 0.5rem !important;
-        padding: 1.5rem !important;
-        border: 1px solid #e2e8f0 !important;
-      }
-      
-      /* Scope details expanded section */
-      .zforms .zforms__section .bg-gray-50 {
-        grid-column: 1 / -1 !important;
-        background: #f8fafc !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 0.5rem !important;
+        background: var(--zforms-bg) !important;
+        border: 1px solid var(--zforms-border) !important;
+        border-radius: var(--zforms-radius) !important;
         margin: 0.5rem 0 !important;
         padding: 1rem !important;
       }
       
       /* Responsive design */
-      @media (max-width: 1024px) {
-        .zforms .zforms__section .zforms__table {
-          grid-template-columns: 2fr 1fr 1.5fr 1fr 1.5fr !important;
-          gap: 0.75rem !important;
-          padding: 0.75rem !important;
-        }
-        
-        .zforms .zforms__section .z-row .zforms__cell {
-          padding: 0.75rem !important;
-          min-height: 70px !important;
-        }
-      }
-      
       @media (max-width: 768px) {
-        .zforms .zforms__section .zforms__table {
-          grid-template-columns: 1fr !important;
-          gap: 1rem !important;
-        }
-        
         .zforms .zforms__section .zforms__head {
           display: none !important;
         }
         
         .zforms .zforms__section .z-row {
-          display: grid !important;
-          grid-template-columns: 1fr !important;
-          gap: 0.5rem !important;
-          background: white !important;
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 0.75rem !important;
           padding: 1rem !important;
-          border-radius: 0.5rem !important;
-          border: 1px solid #e2e8f0 !important;
+          margin-bottom: 1rem !important;
+          border: 1px solid var(--zforms-border) !important;
+          border-radius: var(--zforms-radius) !important;
+          background: var(--zforms-surface) !important;
+          box-shadow: var(--zforms-shadow) !important;
         }
         
-        .zforms .zforms__section .z-row .zforms__cell {
-          border: none !important;
-          padding: 0.5rem 0 !important;
-          min-height: auto !important;
-          text-align: left !important;
+        .zforms .zforms__section .zforms__cell {
+          padding: 0 !important;
+          border-bottom: 1px solid var(--zforms-border) !important;
+          padding-bottom: 0.75rem !important;
           justify-content: flex-start !important;
           align-items: flex-start !important;
         }
         
-        .zforms .zforms__section .zforms__cell[data-label="Actions"] {
-          justify-content: flex-start !important;
-        }
-        
-        .zforms .zforms__section .zforms__cell[data-label="Actions"] .flex {
-          justify-content: flex-start !important;
+        .zforms .zforms__section .zforms__cell:last-child {
+          border-bottom: none !important;
+          padding-bottom: 0 !important;
         }
         
         /* Mobile labels */
         .zforms .zforms__section .zforms__cell::before {
           content: attr(data-label) !important;
           display: block !important;
-          font-weight: 600 !important;
           font-size: 0.75rem !important;
-          color: #64748b !important;
-          margin-bottom: 0.25rem !important;
+          font-weight: 600 !important;
           text-transform: uppercase !important;
           letter-spacing: 0.05em !important;
-        }
-        
-        /* Mobile expanded content */
-        .zforms .zforms__section .z-row--edit-expanded,
-        .zforms .zforms__section .z-row--details-expanded {
-          grid-column: 1 !important;
-          margin: 0.5rem 0 !important;
-        }
-        
-        .zforms .zforms__section .zforms__edit-section,
-        .zforms .zforms__section .zforms__details-section {
-          grid-column: 1 !important;
-          margin: 0.5rem 0 !important;
-        }
-        
-        .zforms .zforms__section .bg-gray-50 {
-          grid-column: 1 !important;
-          margin: 0.5rem 0 !important;
+          color: var(--zforms-muted) !important;
+          margin-bottom: 0.25rem !important;
         }
       }
     `;
@@ -510,17 +393,14 @@ const MyScopes: React.FC = () => {
     <div className="zform-dashboard">
       <div className="zform-dashboard-container">
         {/* Header Section */}
-        <div className="zform-dashboard-header mb-12">
-          <div className="zform-dashboard-icon">
+        <div className="zform-dashboard-header mb-12" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="zform-dashboard-icon" style={{ flexShrink: 0 }}>
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </div>
           <div>
             <h1 className="zform-dashboard-title">My Scopes</h1>
-            <p className="zform-dashboard-subtitle">
-              Welcome, {currentUser?.fullName} ({currentUser?.designation})
-            </p>
           </div>
         </div>
 

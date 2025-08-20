@@ -103,21 +103,6 @@ const Admin: React.FC = () => {
   return (
     <div className="zforms">
       <div className="zforms__section">
-        <div className="zforms__header">
-          <div className="zforms__icon">
-            <svg className="zforms__icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="zforms__title">Create User</h1>
-            <p className="zforms__subtitle">
-              Welcome, {currentUser?.fullName} ({currentUser?.designation})
-            </p>
-          </div>
-        </div>
-
         {error && (
           <div className="zforms__error">
             {error}
@@ -130,131 +115,237 @@ const Admin: React.FC = () => {
           </div>
         )}
 
-        <div className="zforms__content">
-          <div className="zforms__form-grid">
-            {/* Create User Section */}
-            <div className="zforms__section">
-              <h2 className="zforms__title">Create New User</h2>
-              <form onSubmit={handleSubmit} className="zforms__form">
-                <div className="zforms__form-field">
-                  <label className="zforms__form-label">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="zforms__form-input"
-                    placeholder="Enter full name"
-                    required
-                  />
-                </div>
-
-                              <div className="zforms__form-field">
-                  <label className="zforms__form-label">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="zforms__form-input"
-                    placeholder="Enter email address"
-                    required
-                  />
-                </div>
-
-                <div className="zforms__form-field">
-                  <label className="zforms__form-label">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="zforms__form-input"
-                    placeholder="Enter password"
-                    required
-                  />
-                </div>
-
-                <div className="zforms__form-field">
-                  <label className="zforms__form-label">
-                    Designation
-                  </label>
-                  <input
-                    type="text"
-                    value={designation}
-                    onChange={(e) => setDesignation(e.target.value)}
-                    className="zforms__form-input"
-                    placeholder="Enter designation (e.g., Consultant, Manager)"
-                    required
-                  />
-                </div>
-
-                <div className="zforms__form-field">
-                  <label className="zforms__form-label">
-                    Role
-                  </label>
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    className="zforms__form-input"
-                    required
-                  >
-                    <option value="">Select a role</option>
-                    <option value="FRONT_OFFICE">Front Office</option>
-                    <option value="BACK_OFFICE">Back Office</option>
-                    <option value="ADMIN">Admin</option>
-                  </select>
-                </div>
-
-                <div className="zforms__form-actions">
-                  <button 
-                    type="submit" 
-                    disabled={loading}
-                    className="zforms__button zforms__button--primary"
-                  >
-                    {loading ? "Creating..." : "Create User"}
-                  </button>
-                </div>
-              </form>
+                {/* Create User Section */}
+        <div className="zforms__section">
+          <div className="zforms__header">
+            <div className="zforms__title" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Create New User
             </div>
+          </div>
+          
+          <div className="zforms__content">
+            <form onSubmit={handleSubmit} className="zforms__form">
+              <div className="zforms__form-field">
+                <label className="zforms__form-label">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="zforms__form-input"
+                  placeholder="Enter full name"
+                  required
+                />
+              </div>
 
-            {/* Users List */}
-            <div className="zforms__section">
-              <h2 className="zforms__title">All Users ({userPage?.totalElements || 0})</h2>
+              <div className="zforms__form-field">
+                <label className="zforms__form-label">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="zforms__form-input"
+                  placeholder="Enter email address"
+                  required
+                />
+              </div>
+
+              <div className="zforms__form-field">
+                <label className="zforms__form-label">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="zforms__form-input"
+                  placeholder="Enter password"
+                  required
+                />
+              </div>
+
+              <div className="zforms__form-field">
+                <label className="zforms__form-label">
+                  Designation
+                </label>
+                <input
+                  type="text"
+                  value={designation}
+                  onChange={(e) => setDesignation(e.target.value)}
+                  className="zforms__form-input"
+                  placeholder="Enter designation (e.g., Consultant, Manager)"
+                  required
+                />
+              </div>
+
+              <div className="zforms__form-field">
+                <label className="zforms__form-label">
+                  Role
+                </label>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="zforms__form-input"
+                  required
+                >
+                  <option value="">Select a role</option>
+                  <option value="FRONT_OFFICE">Front Office</option>
+                  <option value="BACK_OFFICE">Back Office</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </div>
+
+              <div className="zforms__form-actions" style={{ justifyContent: 'flex-start' }}>
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="zforms__button zforms__button--primary"
+                >
+                  {loading ? "Creating..." : "Create User"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* Users List Section */}
+        <div className="zforms__section">
+          <div className="zforms__header">
+            <div className="zforms__title" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              All Users ({userPage?.totalElements || 0})
+            </div>
+          </div>
+          
+          <div className="zforms__content">
               {users.length === 0 ? (
                 <div className="zforms__empty">
                   <p className="zforms__empty-text">No users found.</p>
                 </div>
               ) : (
                 <div className="zforms__table-container">
-                  <table className="zforms__table">
-                    <thead className="zforms__table-header">
+                  <table className="admin-table" style={{ 
+                    width: '100%', 
+                    tableLayout: 'fixed',
+                    borderCollapse: 'collapse',
+                    borderSpacing: 0,
+                    background: 'white',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+                  }}>
+                    <thead>
                       <tr>
-                        <th className="zforms__table-header-cell">Name</th>
-                        <th className="zforms__table-header-cell">Email</th>
-                        <th className="zforms__table-header-cell">Designation</th>
-                        <th className="zforms__table-header-cell">Roles</th>
+                        <th style={{ 
+                          width: '20%', 
+                          textAlign: 'left',
+                          padding: '12px 16px',
+                          borderBottom: '2px solid #e5e7eb',
+                          fontWeight: 'bold',
+                          fontSize: '12px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          color: '#6b7280',
+                          backgroundColor: '#f9fafb'
+                        }}>Name</th>
+                        <th style={{ 
+                          width: '30%', 
+                          textAlign: 'left',
+                          padding: '12px 16px',
+                          borderBottom: '2px solid #e5e7eb',
+                          fontWeight: 'bold',
+                          fontSize: '12px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          color: '#6b7280',
+                          backgroundColor: '#f9fafb'
+                        }}>Email</th>
+                        <th style={{ 
+                          width: '25%', 
+                          textAlign: 'left',
+                          padding: '12px 16px',
+                          borderBottom: '2px solid #e5e7eb',
+                          fontWeight: 'bold',
+                          fontSize: '12px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          color: '#6b7280',
+                          backgroundColor: '#f9fafb'
+                        }}>Designation</th>
+                        <th style={{ 
+                          width: '25%', 
+                          textAlign: 'left',
+                          padding: '12px 16px',
+                          borderBottom: '2px solid #e5e7eb',
+                          fontWeight: 'bold',
+                          fontSize: '12px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          color: '#6b7280',
+                          backgroundColor: '#f9fafb'
+                        }}>Roles</th>
                       </tr>
                     </thead>
-                    <tbody className="zforms__table-body">
+                    <tbody>
                       {users.map((user) => (
-                        <tr key={user.id} className="zforms__table-row">
-                          <td className="zforms__table-cell">
-                            <span className="zforms__table-cell-text">{user.fullName}</span>
+                        <tr key={user.id} style={{ 
+                          borderBottom: '1px solid #e5e7eb',
+                          transition: 'background-color 0.2s ease'
+                        }}>
+                          <td style={{ 
+                            width: '20%', 
+                            textAlign: 'left',
+                            padding: '12px 16px',
+                            borderBottom: '1px solid #e5e7eb',
+                            color: '#1f2937',
+                            fontSize: '14px'
+                          }}>
+                            {user.fullName}
                           </td>
-                          <td className="zforms__table-cell">
-                            <span className="zforms__table-cell-text zforms__table-cell-text--muted">{user.email}</span>
+                          <td style={{ 
+                            width: '30%', 
+                            textAlign: 'left',
+                            padding: '12px 16px',
+                            borderBottom: '1px solid #e5e7eb',
+                            color: '#6b7280',
+                            fontSize: '14px'
+                          }}>
+                            {user.email}
                           </td>
-                          <td className="zforms__table-cell">
-                            <span className="zforms__table-cell-text zforms__table-cell-text--muted">{user.designation}</span>
+                          <td style={{ 
+                            width: '25%', 
+                            textAlign: 'left',
+                            padding: '12px 16px',
+                            borderBottom: '1px solid #e5e7eb',
+                            color: '#6b7280',
+                            fontSize: '14px'
+                          }}>
+                            {user.designation}
                           </td>
-                          <td className="zforms__table-cell">
-                            <div className="zforms__badge-group">
+                          <td style={{ 
+                            width: '25%', 
+                            textAlign: 'left',
+                            padding: '12px 16px',
+                            borderBottom: '1px solid #e5e7eb'
+                          }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                               {user.roles.map((role) => (
-                                <span key={role} className="zforms__badge zforms__badge--primary">
+                                <span key={role} style={{
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                  backgroundColor: '#3b82f6',
+                                  color: 'white'
+                                }}>
                                   {role}
                                 </span>
                               ))}
@@ -295,7 +386,6 @@ const Admin: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>
         </div>
       </div>
     </div>
