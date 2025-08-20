@@ -440,7 +440,7 @@ const DocumentManagement: React.FC = () => {
 
         {/* Pending Reviews Section - Back Office Only */}
         {isBackOffice && pendingReviews.length > 0 && (
-          <div className="zforms mb-8">
+          <div className="zforms mb-6">
             <div className="zforms__section">
               <div className="zforms__header">
                 <div className="zforms__title">
