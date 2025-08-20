@@ -502,11 +502,7 @@ const DocumentManagement: React.FC = () => {
                           {expandedReviewId === document.documentId ? 'Hide Review' : 'Review'}
                         </button>
 
-                        {document.notes && (
-                          <div className="zforms__comment" title={document.notes}>
-                            {document.notes}
-                          </div>
-                        )}
+
                       </div>
                     </div>
                     
@@ -657,7 +653,6 @@ const DocumentManagement: React.FC = () => {
                   <div className="zforms__cell">From</div>
                   <div className="zforms__cell">Status</div>
                   <div className="zforms__cell">Updated On</div>
-                  <div className="zforms__cell">Comments</div>
                   <div className="zforms__cell">Actions</div>
                 </div>
                 {myDocuments
@@ -690,50 +685,7 @@ const DocumentManagement: React.FC = () => {
                     <div className="zforms__cell zforms__date" data-label="Updated On">
                       {(document.signedAt || document.sentAt) ? new Date(document.signedAt || document.sentAt).toLocaleDateString() : '-'}
                     </div>
-                    <div className="zforms__cell zforms__details" data-label="Comments">
-                      {/* Comments column - only show back office comments */}
-                      {(() => {
-                        // Extract only the back office comments (initial notes when document was sent)
-                        // Filter out system-generated notes like "Signed by:", "Reviewed by:", etc.
-                        if (!document.notes) {
-                          return (
-                            <div className="zforms__comment-placeholder">
-                              No comments
-                            </div>
-                          );
-                        }
-                        
-                        // Split notes by " | " and find the original back office comment
-                        const noteParts = document.notes.split(' | ');
-                        const backOfficeComment = noteParts.find(part => 
-                          !part.startsWith('Signed by:') && 
-                          !part.startsWith('Reviewed by:') && 
-                          !part.startsWith('Submitted by:') && 
-                          !part.startsWith('Completed:') && 
-                          !part.startsWith('Reviewed:') && 
-                          !part.startsWith('Signer notes:') && 
-                          !part.startsWith('Form notes:') && 
-                          !part.startsWith('Review notes:') && 
-                          !part.startsWith('Saved to Google Drive by:') &&
-                          !part.startsWith('Folder:') &&
-                          !part.startsWith('URL:')
-                        );
-                        
-                        if (backOfficeComment && backOfficeComment.trim()) {
-                          return (
-                            <div className="zforms__comment" title={backOfficeComment.trim()}>
-                              {backOfficeComment.trim()}
-                            </div>
-                          );
-                        } else {
-                          return (
-                            <div className="zforms__comment-placeholder">
-                              No comments
-                            </div>
-                          );
-                                                 }
-                       })()}
-                     </div>
+
                      <div className="zforms__cell zforms__actions" data-label="Actions">
                        {/* Actions column - buttons for document actions */}
                        {document.status === 'SENT' && (
